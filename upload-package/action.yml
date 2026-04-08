@@ -1,0 +1,169 @@
+name: 'Upload Package'
+description: 'Upload conda or Python packages to Anaconda.org or Anaconda Repository (PSM)'
+author: 'Anaconda'
+
+branding:
+  icon: 'upload-cloud'
+  color: 'green'
+
+inputs:
+  token:
+    description: 'API token for authentication'
+    required: true
+  packages:
+    description: 'Path or glob pattern to package files (e.g., ./build/noarch/*.conda or ./dist/*.whl)'
+    required: true
+  owner:
+    description: 'Package owner/channel (e.g., organization name or channel)'
+    required: true
+  target-type:
+    description: 'Upload target type: "anaconda.org" or "repository" (for PSM/Anaconda Business)'
+    required: false
+    default: 'anaconda.org'
+  repository-url:
+    description: 'URL of the repository API (required when target-type is "repository")'
+    required: false
+  package-type:
+    description: 'Type of package: "conda" or "pypi" (auto-detected from file extension if not specified)'
+    required: false
+  summary:
+    description: 'Package summary (anaconda.org only)'
+    required: false
+  private:
+    description: 'Make package private (anaconda.org only)'
+    required: false
+    default: 'false'
+  force:
+    description: 'Overwrite existing packages if they already exist'
+    required: false
+    default: 'false'
+  verbose:
+    description: 'Enable verbose output'
+    required: false
+    default: 'false'
+  cloudflare-client-id:
+    description: 'Cloudflare Access client ID (for Cloudflare-protected repositories)'
+    required: false
+  cloudflare-client-secret:
+    description: 'Cloudflare Access client secret (for Cloudflare-protected repositories)'
+    required: false
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Validate inputs
+      shell: bash
+      run: |
+        if [ "${{ inputs.target-type }}" = "repository" ] && [ -z "${{ inputs.repository-url }}" ]; then
+          echo "::error::repository-url is required when target-type is 'repository'"
+          exit 1
+        fi
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        if ! command -v conda &> /dev/null; then
+          echo "::error::conda is not available. Please set up conda before using this action."
+          exit 1
+        fi
+
+        if [ "${{ inputs.target-type }}" = "anaconda.org" ]; then
+          conda install -y -c defaults anaconda-client
+        else
+          conda install -y -c defaults conda-repo-cli
+          # Install Cloudflare headers injection if credentials provided
+          if [ -n "${{ inputs.cloudflare-client-id }}" ]; then
+            conda install -y -c anaconda-cloud inject-cloudflare-headers
+          fi
+        fi
+
+    - name: Upload to anaconda.org
+      if: inputs.target-type == 'anaconda.org'
+      shell: bash
+      env:
+        ANACONDA_API_TOKEN: ${{ inputs.token }}
+      run: |
+        # Build flags
+        FLAGS=""
+
+        if [ "${{ inputs.force }}" = "true" ]; then
+          FLAGS="$FLAGS --force"
+        fi
+
+        if [ "${{ inputs.private }}" = "true" ]; then
+          FLAGS="$FLAGS --private"
+        fi
+
+        if [ -n "${{ inputs.summary }}" ]; then
+          FLAGS="$FLAGS --summary \"${{ inputs.summary }}\""
+        fi
+
+        if [ "${{ inputs.verbose }}" = "true" ]; then
+          VERBOSE_FLAG="--verbose"
+        else
+          VERBOSE_FLAG=""
+        fi
+
+        # Determine package type flag
+        PACKAGE_TYPE_FLAG=""
+        if [ -n "${{ inputs.package-type }}" ]; then
+          PACKAGE_TYPE_FLAG="--package-type ${{ inputs.package-type }}"
+        fi
+
+        anaconda $VERBOSE_FLAG \
+          --token "$ANACONDA_API_TOKEN" \
+          upload \
+          --user "${{ inputs.owner }}" \
+          $PACKAGE_TYPE_FLAG \
+          $FLAGS \
+          ${{ inputs.packages }}
+
+    - name: Upload to repository
+      if: inputs.target-type == 'repository'
+      shell: bash
+      env:
+        UPLOAD_TOKEN: ${{ inputs.token }}
+        CF_URL_PREFIX: ${{ inputs.repository-url }}
+        CF_CLIENT_ID: ${{ inputs.cloudflare-client-id }}
+        CF_CLIENT_SECRET: ${{ inputs.cloudflare-client-secret }}
+        # Workaround for conda-repo-cli bug when CONDA_PREFIX is not set
+        CONDA_PREFIX: ${{ env.CONDA_PREFIX || '/tmp/conda' }}
+      run: |
+        # Configure the upload site
+        conda repo config --set sites.upload_target.url "${{ inputs.repository-url }}"
+
+        # Build flags
+        FLAGS=""
+
+        if [ "${{ inputs.force }}" = "true" ]; then
+          FLAGS="$FLAGS --force"
+        fi
+
+        if [ "${{ inputs.verbose }}" = "true" ]; then
+          FLAGS="$FLAGS --verbose"
+        fi
+
+        # Determine package type
+        PACKAGE_TYPE_FLAG=""
+        if [ -n "${{ inputs.package-type }}" ]; then
+          PACKAGE_TYPE_FLAG="--package-type ${{ inputs.package-type }}"
+        fi
+
+        # HUB-1697: Workaround to ensure we catch errors from conda-repo-cli
+        # that don't properly set exit codes
+        output=$(
+          conda repo \
+            --token "$UPLOAD_TOKEN" \
+            --site upload_target \
+            upload \
+            --channel "${{ inputs.owner }}" \
+            $PACKAGE_TYPE_FLAG \
+            $FLAGS \
+            ${{ inputs.packages }} \
+            2>&1
+        ) && \
+        echo "$output" && \
+        if echo "$output" | grep -qi "error"; then
+          echo "::error::Upload failed - error detected in output"
+          exit 1
+        fi
