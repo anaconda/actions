@@ -1,0 +1,79 @@
+name: Test upload-package action
+
+on:
+  pull_request:
+    paths:
+      - "upload-package/**"
+      - ".github/workflows/test-upload-package.yml"
+      - "tests/**"
+
+jobs:
+  build-test-package:
+    name: Build test package
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pixi
+        uses: prefix-dev/setup-pixi@v0.8.1
+        with:
+          pixi-version: v0.47.0
+          manifest-path: tests/pixi.toml
+
+      - name: Build test conda package
+        working-directory: tests
+        run: |
+          pixi run rattler-build build \
+            --recipe test-package/recipe.yaml \
+            --output-dir ../build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-conda-package
+          path: ./build/noarch/*.conda
+          if-no-files-found: error
+
+  test-anaconda-org:
+    name: Test anaconda.org upload
+    needs: build-test-package
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download test package
+        uses: actions/download-artifact@v4
+        with:
+          name: test-conda-package
+          path: ./packages
+
+      - name: Upload to anaconda.org
+        uses: ./upload-package
+        with:
+          token: ${{ secrets.ANACONDA_ORG_TEST_TOKEN }}
+          owner: anaconda-cloud
+          packages: ./packages/*.conda
+          private: true
+
+  test-repository:
+    name: Test repository upload
+    needs: build-test-package
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download test package
+        uses: actions/download-artifact@v4
+        with:
+          name: test-conda-package
+          path: ./packages
+
+      - name: Upload to repository
+        uses: ./upload-package
+        with:
+          token: ${{ secrets.PSM_PKGS_INTERNAL_TEST_TOKEN }}
+          owner: anaconda-github-actions-test
+          packages: ./packages/*.conda
+          target-type: repository
+          repository-url: ${{ vars.PSM_PKGS_INTERNAL_TEST_URL }}
+          package-type: conda

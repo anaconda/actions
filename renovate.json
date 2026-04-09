@@ -1,6 +1,24 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "commitMessageLowerCase": "never",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "prefix-dev/pixi",
+      "description": "Upgrade pixi version in a GitHub workflow",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/[^/]+\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "pixi-version:\\s*(?<currentValue>v[\\d.]+)"
+      ]
+    }
+  ],
   "extends": [
     "local>anaconda/renovate-config"
+  ],
+  "gitIgnoredAuthors": [
+    "devops+anaconda-bot@anaconda.com"
   ]
 }

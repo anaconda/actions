@@ -1,0 +1,7 @@
+[workspace]
+name = "test-package-build"
+channels = ["https://repo.anaconda.com/pkgs/main"]
+platforms = ["linux-64", "osx-arm64"]
+
+[dependencies]
+rattler-build = "*"

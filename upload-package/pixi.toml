@@ -1,0 +1,11 @@
+[workspace]
+name = "upload-package-action"
+channels = ["https://repo.anaconda.com/pkgs/main"]
+platforms = ["linux-64", "osx-arm64"]
+
+[dependencies]
+conda = "=26.3.1"
+anaconda-client = "=1.14.1"
+conda-repo-cli = "=1.0.173"
+# Pin setuptools due to removal of pkg_resources causing bug in conda-repo-cli
+setuptools = "<72"

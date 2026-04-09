@@ -1,0 +1,119 @@
+name: "Upload Package"
+description: "Upload conda or Python packages to Anaconda.org or Anaconda Repository (PSM)"
+author: "Anaconda"
+
+inputs:
+  token:
+    description: "API token for authentication"
+    required: true
+  packages:
+    description: "Path or glob pattern to package files (e.g., ./build/noarch/*.conda or ./dist/*.whl)"
+    required: true
+  owner:
+    description: "Package owner/channel (e.g., organization name or channel)"
+    required: true
+  target-type:
+    description: 'Upload target type: "anaconda.org" or "repository" (for PSM/Anaconda Business)'
+    required: false
+    default: "anaconda.org"
+  repository-url:
+    description: 'URL of the repository API (required when target-type is "repository")'
+    required: false
+  package-type:
+    description: 'Type of package: "conda" or "pypi" (auto-detected from file extension if not specified)'
+    required: false
+  summary:
+    description: "Package summary (anaconda.org only)"
+    required: false
+  private:
+    description: "Make package private (anaconda.org only)"
+    required: false
+    default: "false"
+  force:
+    description: "Overwrite existing packages if they already exist"
+    required: false
+    default: "false"
+  verbose:
+    description: "Enable verbose output"
+    required: false
+    default: "false"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Validate inputs
+      shell: bash
+      run: |
+        if [ "${{ inputs.target-type }}" = "repository" ] && [ -z "${{ inputs.repository-url }}" ]; then
+          echo "::error::repository-url is required when target-type is 'repository'"
+          exit 1
+        fi
+
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0.8.1
+      with:
+        pixi-version: v0.47.0
+        manifest-path: ${{ github.action_path }}/pixi.toml
+
+    - name: Upload to anaconda.org
+      if: inputs.target-type == 'anaconda.org'
+      shell: bash
+      env:
+        ANACONDA_API_TOKEN: ${{ inputs.token }}
+        PIXI_PROJECT_MANIFEST: ${{ github.action_path }}/pixi.toml
+      run: |
+        FLAGS=""
+
+        if [ "${{ inputs.force }}" = "true" ]; then
+          FLAGS="$FLAGS --force"
+        fi
+
+        if [ "${{ inputs.private }}" = "true" ]; then
+          FLAGS="$FLAGS --private"
+        fi
+
+        if [ -n "${{ inputs.summary }}" ]; then
+          FLAGS="$FLAGS --summary \"${{ inputs.summary }}\""
+        fi
+
+        if [ "${{ inputs.verbose }}" = "true" ]; then
+          FLAGS="$FLAGS --verbose"
+        fi
+
+        if [ -n "${{ inputs.package-type }}" ]; then
+          FLAGS="$FLAGS --package-type ${{ inputs.package-type }}"
+        fi
+
+        pixi run anaconda \
+          --token "$ANACONDA_API_TOKEN" \
+          upload \
+          --user "${{ inputs.owner }}" \
+          $FLAGS \
+          ${{ inputs.packages }}
+
+    - name: Upload to repository
+      if: inputs.target-type == 'repository'
+      shell: bash
+      env:
+        UPLOAD_TOKEN: ${{ inputs.token }}
+        PIXI_PROJECT_MANIFEST: ${{ github.action_path }}/pixi.toml
+      run: |
+        pixi run conda repo config --set sites.upload_target.url "${{ inputs.repository-url }}"
+
+        FLAGS=""
+
+        if [ "${{ inputs.verbose }}" = "true" ]; then
+          FLAGS="$FLAGS --verbose"
+        fi
+
+        if [ -n "${{ inputs.package-type }}" ]; then
+          FLAGS="$FLAGS --package-type ${{ inputs.package-type }}"
+        fi
+
+        pixi run conda repo \
+          --token "$UPLOAD_TOKEN" \
+          --site upload_target \
+          upload \
+          --channel "${{ inputs.owner }}" \
+          $FLAGS \
+          ${{ inputs.packages }}
