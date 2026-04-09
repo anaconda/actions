@@ -37,12 +37,6 @@ inputs:
     description: "Enable verbose output"
     required: false
     default: "false"
-  cloudflare-client-id:
-    description: "Cloudflare Access client ID (for Cloudflare-protected repositories)"
-    required: false
-  cloudflare-client-secret:
-    description: "Cloudflare Access client secret (for Cloudflare-protected repositories)"
-    required: false
 
 runs:
   using: "composite"
@@ -60,13 +54,6 @@ runs:
       with:
         pixi-version: v0.47.0
         manifest-path: ${{ github.action_path }}/pixi.toml
-
-    - name: Install Cloudflare headers (if needed)
-      if: inputs.target-type == 'repository' && inputs.cloudflare-client-id != ''
-      shell: bash
-      working-directory: ${{ github.action_path }}
-      run: |
-        pixi add --pypi inject-cloudflare-headers
 
     - name: Upload to anaconda.org
       if: inputs.target-type == 'anaconda.org'
@@ -115,9 +102,6 @@ runs:
       shell: bash
       env:
         UPLOAD_TOKEN: ${{ inputs.token }}
-        CF_URL_PREFIX: ${{ inputs.repository-url }}
-        CF_CLIENT_ID: ${{ inputs.cloudflare-client-id }}
-        CF_CLIENT_SECRET: ${{ inputs.cloudflare-client-secret }}
         PIXI_PROJECT_MANIFEST: ${{ github.action_path }}/pixi.toml
       run: |
         # Configure the upload site
