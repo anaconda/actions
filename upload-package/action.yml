@@ -127,10 +127,10 @@ runs:
       if: inputs.target-type == 'self-hosted'
       shell: bash
       env:
-        UPLOAD_TOKEN: ${{ inputs.token }}
+        ANACONDA_AUTH_API_KEY: ${{ inputs.token }}
         PIXI_PROJECT_MANIFEST: ${{ github.action_path }}/pixi.toml
       run: |
-        pixi run -e self-hosted anaconda repo config --set sites.upload_target.url "${{ inputs.repository-url }}"
+        pixi run -e self-hosted anaconda sites add --default --domain "${{ inputs.repository-url }}"
 
         FLAGS=""
 
@@ -142,10 +142,7 @@ runs:
           FLAGS="$FLAGS --package-type ${{ inputs.package-type }}"
         fi
 
-        pixi run -e self-hosted anaconda repo \
-          --token "$UPLOAD_TOKEN" \
-          --site upload_target \
-          upload \
+        pixi run -e self-hosted anaconda repo upload \
           --channel "${{ inputs.owner }}" \
           $FLAGS \
           ${{ inputs.packages }}
