@@ -10,7 +10,7 @@ Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anacon
 | `packages` | Path or glob pattern to package files | Yes | - |
 | `owner` | Package owner/channel (org name or channel) | Yes | - |
 | `target-type` | `anaconda.org`, `repository`, or `self-hosted` | No | `anaconda.org` |
-| `repository-url` | URL of repository API (required for `repository` and `self-hosted` targets) | No | - |
+| `repository-url` | Repository API URL for `repository` target, or domain for `self-hosted` target | No | - |
 | `package-type` | `conda` or `pypi` (auto-detected if not specified) | No | - |
 | `summary` | Package summary (anaconda.org only) | No | - |
 | `private` | Make package private (anaconda.org only) | No | `false` |
@@ -67,7 +67,7 @@ Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anacon
     owner: my-channel
     packages: ./build/noarch/*.conda
     target-type: self-hosted
-    repository-url: https://anaconda.mycompany.com/api/repo
+    repository-url: https://anaconda.mycompany.com
     package-type: conda
 ```
 
