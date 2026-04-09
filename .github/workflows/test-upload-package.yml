@@ -10,7 +10,7 @@ on:
 jobs:
   build-test-package:
     name: Build test package
-    runs-on: ubuntu-latest
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
     steps:
       - uses: actions/checkout@v4
 
@@ -36,7 +36,7 @@ jobs:
   test-anaconda-org:
     name: Test anaconda.org upload
     needs: build-test-package
-    runs-on: ubuntu-latest
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
     steps:
       - uses: actions/checkout@v4
 
@@ -57,7 +57,7 @@ jobs:
   test-repository:
     name: Test repository upload
     needs: build-test-package
-    runs-on: ubuntu-latest
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
     steps:
       - uses: actions/checkout@v4
 
