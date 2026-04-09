@@ -6,7 +6,7 @@ Reusable GitHub Actions for Anaconda customers.
 
 ### [upload-package](./upload-package)
 
-Upload conda or Python packages to Anaconda.org or Anaconda Repository (PSM/Anaconda Business).
+Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anaconda Business), or self-hosted Anaconda Platform.
 
 **Upload to anaconda.org:**
 ```yaml
@@ -26,6 +26,17 @@ Upload conda or Python packages to Anaconda.org or Anaconda Repository (PSM/Anac
     packages: ./build/**/*.conda
     target-type: repository
     repository-url: https://pkgs.example.com/api/repo
+```
+
+**Upload to self-hosted Anaconda Platform:**
+```yaml
+- uses: anaconda/github-actions/upload-package@v1
+  with:
+    token: ${{ secrets.AP_API_KEY }}
+    owner: my-channel
+    packages: ./build/**/*.conda
+    target-type: self-hosted
+    repository-url: https://anaconda.mycompany.com
 ```
 
 See the [upload-package README](./upload-package/README.md) for full documentation.
