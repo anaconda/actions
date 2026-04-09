@@ -6,6 +6,10 @@ on:
       - "upload-package/**"
       - ".github/workflows/test-upload-package.yml"
       - "tests/**"
+  merge_group:
+
+permissions:
+  contents: read
 
 jobs:
   build-test-package:
@@ -77,3 +81,14 @@ jobs:
           target-type: repository
           repository-url: ${{ vars.PSM_PKGS_INTERNAL_TEST_URL }}
           package-type: conda
+
+  check:
+    name: Check
+    if: always()
+    needs: [build-test-package, test-anaconda-org, test-repository]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide whether all jobs succeeded
+        uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe # v1.2.2
+        with:
+          jobs: ${{ toJSON(needs) }}
