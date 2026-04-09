@@ -5,28 +5,7 @@ on:
     paths:
       - 'upload-package/**'
       - '.github/workflows/test-upload-package.yml'
-  workflow_dispatch:
-    inputs:
-      target-type:
-        description: 'Upload target type'
-        required: true
-        default: 'anaconda.org'
-        type: choice
-        options:
-          - anaconda.org
-          - repository
-      owner:
-        description: 'Owner/channel to upload to'
-        required: true
-        default: 'anaconda-github-actions-test'
-      repository-url:
-        description: 'Repository URL (for repository target)'
-        required: false
-      dry-run:
-        description: 'Dry run (skip actual upload)'
-        required: false
-        default: true
-        type: boolean
+      - 'tests/**'
 
 jobs:
   build-test-package:
@@ -55,11 +34,9 @@ jobs:
           if-no-files-found: error
 
   test-anaconda-org:
-    name: Test upload to anaconda.org
+    name: Test anaconda.org upload
     needs: build-test-package
     runs-on: ubuntu-latest
-    # Only run on workflow_dispatch when anaconda.org is selected, or on PR (dry-run)
-    if: github.event_name == 'pull_request' || inputs.target-type == 'anaconda.org'
     steps:
       - uses: actions/checkout@v4
 
@@ -74,32 +51,18 @@ jobs:
         with:
           auto-activate-base: true
 
-      - name: Test upload action (dry-run)
-        if: github.event_name == 'pull_request' || inputs.dry-run
-        shell: bash -el {0}
-        run: |
-          echo "=== DRY RUN ==="
-          echo "Would upload packages:"
-          ls -la ./packages/
-          echo ""
-          echo "Target: anaconda.org"
-          echo "Owner: ${{ inputs.owner || 'anaconda-github-actions-test' }}"
-
       - name: Upload to anaconda.org
-        if: github.event_name == 'workflow_dispatch' && !inputs.dry-run
         uses: ./upload-package
         with:
           token: ${{ secrets.ANACONDA_ORG_TEST_TOKEN }}
-          owner: ${{ inputs.owner }}
+          owner: anaconda-github-actions-test
           packages: ./packages/*.conda
           force: true
 
   test-repository:
-    name: Test upload to repository
+    name: Test repository upload
     needs: build-test-package
     runs-on: ubuntu-latest
-    # Only run on workflow_dispatch when repository is selected
-    if: github.event_name == 'workflow_dispatch' && inputs.target-type == 'repository'
     steps:
       - uses: actions/checkout@v4
 
@@ -114,26 +77,13 @@ jobs:
         with:
           auto-activate-base: true
 
-      - name: Test upload action (dry-run)
-        if: inputs.dry-run
-        shell: bash -el {0}
-        run: |
-          echo "=== DRY RUN ==="
-          echo "Would upload packages:"
-          ls -la ./packages/
-          echo ""
-          echo "Target: repository"
-          echo "URL: ${{ inputs.repository-url }}"
-          echo "Channel: ${{ inputs.owner }}"
-
       - name: Upload to repository
-        if: "!inputs.dry-run"
         uses: ./upload-package
         with:
           token: ${{ secrets.PSM_TEST_TOKEN }}
-          owner: ${{ inputs.owner }}
+          owner: github-actions-test
           packages: ./packages/*.conda
           target-type: repository
-          repository-url: ${{ inputs.repository-url }}
+          repository-url: ${{ vars.PSM_TEST_URL }}
           package-type: conda
           force: true
