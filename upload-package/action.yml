@@ -140,21 +140,11 @@ runs:
           PACKAGE_TYPE_FLAG="--package-type ${{ inputs.package-type }}"
         fi
 
-        # HUB-1697: Workaround to ensure we catch errors from conda-repo-cli
-        # that don't properly set exit codes
-        output=$(
-          pixi run conda repo \
-            --token "$UPLOAD_TOKEN" \
-            --site upload_target \
-            upload \
-            --channel "${{ inputs.owner }}" \
-            $PACKAGE_TYPE_FLAG \
-            $FLAGS \
-            ${{ inputs.packages }} \
-            2>&1
-        ) && \
-        echo "$output" && \
-        if echo "$output" | grep -qi "error"; then
-          echo "::error::Upload failed - error detected in output"
-          exit 1
-        fi
+        pixi run conda repo \
+          --token "$UPLOAD_TOKEN" \
+          --site upload_target \
+          upload \
+          --channel "${{ inputs.owner }}" \
+          $PACKAGE_TYPE_FLAG \
+          $FLAGS \
+          ${{ inputs.packages }}
