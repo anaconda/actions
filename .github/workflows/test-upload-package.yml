@@ -12,10 +12,10 @@ jobs:
     name: Build test package
     runs-on: self-hosted-amd64-medium-privileged-on-demand
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Setup pixi
-        uses: prefix-dev/setup-pixi@v0.8.1
+        uses: prefix-dev/setup-pixi@ba3bb36eb2066252b2363392b7739741bb777659 # v0.8.1
         with:
           pixi-version: v0.47.0
           manifest-path: tests/pixi.toml
@@ -28,7 +28,7 @@ jobs:
             --output-dir ../build
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: test-conda-package
           path: ./build/noarch/*.conda
@@ -39,10 +39,10 @@ jobs:
     needs: build-test-package
     runs-on: self-hosted-amd64-medium-privileged-on-demand
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Download test package
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: test-conda-package
           path: ./packages
@@ -60,10 +60,10 @@ jobs:
     needs: build-test-package
     runs-on: self-hosted-amd64-medium-privileged-on-demand
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Download test package
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: test-conda-package
           path: ./packages
