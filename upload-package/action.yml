@@ -62,7 +62,6 @@ runs:
         ANACONDA_API_TOKEN: ${{ inputs.token }}
         PIXI_PROJECT_MANIFEST: ${{ github.action_path }}/pixi.toml
       run: |
-        # Build flags
         FLAGS=""
 
         if [ "${{ inputs.force }}" = "true" ]; then
@@ -78,22 +77,17 @@ runs:
         fi
 
         if [ "${{ inputs.verbose }}" = "true" ]; then
-          VERBOSE_FLAG="--verbose"
-        else
-          VERBOSE_FLAG=""
+          FLAGS="$FLAGS --verbose"
         fi
 
-        # Determine package type flag
-        PACKAGE_TYPE_FLAG=""
         if [ -n "${{ inputs.package-type }}" ]; then
-          PACKAGE_TYPE_FLAG="--package-type ${{ inputs.package-type }}"
+          FLAGS="$FLAGS --package-type ${{ inputs.package-type }}"
         fi
 
-        pixi run anaconda $VERBOSE_FLAG \
+        pixi run anaconda \
           --token "$ANACONDA_API_TOKEN" \
           upload \
           --user "${{ inputs.owner }}" \
-          $PACKAGE_TYPE_FLAG \
           $FLAGS \
           ${{ inputs.packages }}
 
@@ -104,25 +98,16 @@ runs:
         UPLOAD_TOKEN: ${{ inputs.token }}
         PIXI_PROJECT_MANIFEST: ${{ github.action_path }}/pixi.toml
       run: |
-        # Configure the upload site
         pixi run conda repo config --set sites.upload_target.url "${{ inputs.repository-url }}"
 
-        # Build flags
         FLAGS=""
-
-        # There is no force flag for conda-repo-cli?
-        # if [ "${{ inputs.force }}" = "true" ]; then
-        #   FLAGS="$FLAGS --force"
-        # fi
 
         if [ "${{ inputs.verbose }}" = "true" ]; then
           FLAGS="$FLAGS --verbose"
         fi
 
-        # Determine package type
-        PACKAGE_TYPE_FLAG=""
         if [ -n "${{ inputs.package-type }}" ]; then
-          PACKAGE_TYPE_FLAG="--package-type ${{ inputs.package-type }}"
+          FLAGS="$FLAGS --package-type ${{ inputs.package-type }}"
         fi
 
         pixi run conda repo \
@@ -130,6 +115,5 @@ runs:
           --site upload_target \
           upload \
           --channel "${{ inputs.owner }}" \
-          $PACKAGE_TYPE_FLAG \
           $FLAGS \
           ${{ inputs.packages }}
