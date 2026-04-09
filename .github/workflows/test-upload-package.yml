@@ -99,7 +99,7 @@ jobs:
         uses: ./upload-package
         with:
           token: ${{ secrets.AP_STAGING_API_KEY }}
-          owner: anaconda-cloud
+          owner: anaconda-github-actions-test
           packages: ./packages/*.conda
           target-type: self-hosted
           repository-url: ${{ vars.AP_STAGING_URL }}
