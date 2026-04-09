@@ -59,34 +59,25 @@ runs:
           exit 1
         fi
 
-    - name: Setup miniconda
-      uses: conda-incubator/setup-miniconda@v3
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0.8.1
       with:
-        miniconda-version: latest
-        auto-activate-base: false
+        manifest-path: ${{ github.action_path }}/pixi.toml
 
-    - name: Install dependencies
-      shell: bash -el {0}
+    - name: Install Cloudflare headers (if needed)
+      if: inputs.target-type == 'repository' && inputs.cloudflare-client-id != ''
+      shell: bash
+      working-directory: ${{ github.action_path }}
       run: |
-        conda create -y -n _upload-package-action
-        if [ "${{ inputs.target-type }}" = "anaconda.org" ]; then
-          conda install -y -n _upload-package-action -c defaults anaconda-client
-        else
-          conda install -y -n _upload-package-action -c defaults conda-repo-cli
-          # Install Cloudflare headers injection if credentials provided
-          if [ -n "${{ inputs.cloudflare-client-id }}" ]; then
-            conda install -y -n _upload-package-action -c anaconda-cloud inject-cloudflare-headers
-          fi
-        fi
+        pixi add --pypi inject-cloudflare-headers
 
     - name: Upload to anaconda.org
       if: inputs.target-type == 'anaconda.org'
-      shell: bash -el {0}
+      shell: bash
       env:
         ANACONDA_API_TOKEN: ${{ inputs.token }}
+        PIXI_PROJECT_MANIFEST: ${{ github.action_path }}/pixi.toml
       run: |
-        conda activate _upload-package-action
-
         # Build flags
         FLAGS=""
 
@@ -114,7 +105,7 @@ runs:
           PACKAGE_TYPE_FLAG="--package-type ${{ inputs.package-type }}"
         fi
 
-        anaconda $VERBOSE_FLAG \
+        pixi run anaconda $VERBOSE_FLAG \
           --token "$ANACONDA_API_TOKEN" \
           upload \
           --user "${{ inputs.owner }}" \
@@ -124,17 +115,16 @@ runs:
 
     - name: Upload to repository
       if: inputs.target-type == 'repository'
-      shell: bash -el {0}
+      shell: bash
       env:
         UPLOAD_TOKEN: ${{ inputs.token }}
         CF_URL_PREFIX: ${{ inputs.repository-url }}
         CF_CLIENT_ID: ${{ inputs.cloudflare-client-id }}
         CF_CLIENT_SECRET: ${{ inputs.cloudflare-client-secret }}
+        PIXI_PROJECT_MANIFEST: ${{ github.action_path }}/pixi.toml
       run: |
-        conda activate _upload-package-action
-
         # Configure the upload site
-        conda repo config --set sites.upload_target.url "${{ inputs.repository-url }}"
+        pixi run conda repo config --set sites.upload_target.url "${{ inputs.repository-url }}"
 
         # Build flags
         FLAGS=""
@@ -156,7 +146,7 @@ runs:
         # HUB-1697: Workaround to ensure we catch errors from conda-repo-cli
         # that don't properly set exit codes
         output=$(
-          conda repo \
+          pixi run conda repo \
             --token "$UPLOAD_TOKEN" \
             --site upload_target \
             upload \

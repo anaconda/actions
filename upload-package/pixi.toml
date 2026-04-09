@@ -1,0 +1,9 @@
+[workspace]
+name = "upload-package-action"
+channels = ["https://repo.anaconda.com/pkgs/main"]
+platforms = ["linux-64", "osx-arm64"]
+
+[dependencies]
+conda = "*"
+anaconda-client = "*"
+conda-repo-cli = "*"
