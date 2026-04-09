@@ -78,4 +78,4 @@ jobs:
           target-type: repository
           repository-url: ${{ vars.PSM_PKGS_INTERNAL_TEST_URL }}
           package-type: conda
-          force: true
+          force: false

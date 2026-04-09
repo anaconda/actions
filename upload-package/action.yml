@@ -1,21 +1,21 @@
-name: 'Upload Package'
-description: 'Upload conda or Python packages to Anaconda.org or Anaconda Repository (PSM)'
-author: 'Anaconda'
+name: "Upload Package"
+description: "Upload conda or Python packages to Anaconda.org or Anaconda Repository (PSM)"
+author: "Anaconda"
 
 inputs:
   token:
-    description: 'API token for authentication'
+    description: "API token for authentication"
     required: true
   packages:
-    description: 'Path or glob pattern to package files (e.g., ./build/noarch/*.conda or ./dist/*.whl)'
+    description: "Path or glob pattern to package files (e.g., ./build/noarch/*.conda or ./dist/*.whl)"
     required: true
   owner:
-    description: 'Package owner/channel (e.g., organization name or channel)'
+    description: "Package owner/channel (e.g., organization name or channel)"
     required: true
   target-type:
     description: 'Upload target type: "anaconda.org" or "repository" (for PSM/Anaconda Business)'
     required: false
-    default: 'anaconda.org'
+    default: "anaconda.org"
   repository-url:
     description: 'URL of the repository API (required when target-type is "repository")'
     required: false
@@ -23,29 +23,29 @@ inputs:
     description: 'Type of package: "conda" or "pypi" (auto-detected from file extension if not specified)'
     required: false
   summary:
-    description: 'Package summary (anaconda.org only)'
+    description: "Package summary (anaconda.org only)"
     required: false
   private:
-    description: 'Make package private (anaconda.org only)'
+    description: "Make package private (anaconda.org only)"
     required: false
-    default: 'false'
+    default: "false"
   force:
-    description: 'Overwrite existing packages if they already exist'
+    description: "Overwrite existing packages if they already exist"
     required: false
-    default: 'false'
+    default: "false"
   verbose:
-    description: 'Enable verbose output'
+    description: "Enable verbose output"
     required: false
-    default: 'false'
+    default: "false"
   cloudflare-client-id:
-    description: 'Cloudflare Access client ID (for Cloudflare-protected repositories)'
+    description: "Cloudflare Access client ID (for Cloudflare-protected repositories)"
     required: false
   cloudflare-client-secret:
-    description: 'Cloudflare Access client secret (for Cloudflare-protected repositories)'
+    description: "Cloudflare Access client secret (for Cloudflare-protected repositories)"
     required: false
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Validate inputs
       shell: bash
@@ -126,9 +126,10 @@ runs:
         # Build flags
         FLAGS=""
 
-        if [ "${{ inputs.force }}" = "true" ]; then
-          FLAGS="$FLAGS --force"
-        fi
+        # There is no force flag for conda-repo-cli?
+        # if [ "${{ inputs.force }}" = "true" ]; then
+        #   FLAGS="$FLAGS --force"
+        # fi
 
         if [ "${{ inputs.verbose }}" = "true" ]; then
           FLAGS="$FLAGS --verbose"
