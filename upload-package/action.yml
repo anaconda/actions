@@ -59,14 +59,15 @@ runs:
           exit 1
         fi
 
-    - name: Install dependencies
-      shell: bash
-      run: |
-        if ! command -v conda &> /dev/null; then
-          echo "::error::conda is not available. Please set up conda before using this action."
-          exit 1
-        fi
+    - name: Setup miniconda
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        miniconda-version: latest
+        auto-activate-base: true
 
+    - name: Install dependencies
+      shell: bash -el {0}
+      run: |
         if [ "${{ inputs.target-type }}" = "anaconda.org" ]; then
           conda install -y -c defaults anaconda-client
         else
@@ -79,7 +80,7 @@ runs:
 
     - name: Upload to anaconda.org
       if: inputs.target-type == 'anaconda.org'
-      shell: bash
+      shell: bash -el {0}
       env:
         ANACONDA_API_TOKEN: ${{ inputs.token }}
       run: |
@@ -120,7 +121,7 @@ runs:
 
     - name: Upload to repository
       if: inputs.target-type == 'repository'
-      shell: bash
+      shell: bash -el {0}
       env:
         UPLOAD_TOKEN: ${{ inputs.token }}
         CF_URL_PREFIX: ${{ inputs.repository-url }}

@@ -3,9 +3,9 @@ name: Test upload-package action
 on:
   pull_request:
     paths:
-      - 'upload-package/**'
-      - '.github/workflows/test-upload-package.yml'
-      - 'tests/**'
+      - "upload-package/**"
+      - ".github/workflows/test-upload-package.yml"
+      - "tests/**"
 
 jobs:
   build-test-package:
@@ -46,11 +46,6 @@ jobs:
           name: test-conda-package
           path: ./packages
 
-      - name: Setup miniconda
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          auto-activate-base: true
-
       - name: Upload to anaconda.org
         uses: ./upload-package
         with:
@@ -71,11 +66,6 @@ jobs:
         with:
           name: test-conda-package
           path: ./packages
-
-      - name: Setup miniconda
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          auto-activate-base: true
 
       - name: Upload to repository
         uses: ./upload-package

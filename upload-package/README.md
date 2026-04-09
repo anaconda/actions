@@ -2,10 +2,6 @@
 
 Upload conda or Python packages to Anaconda.org or Anaconda Repository (PSM/Anaconda Business).
 
-## Prerequisites
-
-This action requires `conda` to be available in the environment. Use [conda-incubator/setup-miniconda](https://github.com/conda-incubator/setup-miniconda) or similar before calling this action.
-
 ## Inputs
 
 | Input | Description | Required | Default |
@@ -115,14 +111,13 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: conda-package
           path: ./dist
-
-      - name: Setup miniconda
-        uses: conda-incubator/setup-miniconda@v3
 
       - name: Upload to anaconda.org
         uses: anaconda/github-actions/upload-package@v1
@@ -136,14 +131,13 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: conda-package
           path: ./dist
-
-      - name: Setup miniconda
-        uses: conda-incubator/setup-miniconda@v3
 
       - name: Upload to PSM
         uses: anaconda/github-actions/upload-package@v1
