@@ -3,9 +3,24 @@ name = "upload-package-action"
 channels = ["https://repo.anaconda.com/pkgs/main"]
 platforms = ["linux-64", "osx-arm64"]
 
+# Shared dependencies for all environments
 [dependencies]
 conda = "=26.3.1"
 anaconda-client = "=1.14.1"
-conda-repo-cli = "=1.0.173"
 # Pin setuptools due to removal of pkg_resources causing bug in conda-repo-cli
 setuptools = "<72"
+
+# Feature for repository uploads (PSM/Anaconda Business)
+[feature.repository.dependencies]
+conda-repo-cli = "=1.0.173"
+
+# Feature for self-hosted Anaconda Platform uploads
+[feature.self-hosted]
+channels = ["anaconda-cloud/label/dev", "https://repo.anaconda.com/pkgs/main"]
+
+[feature.self-hosted.dependencies]
+anaconda-repo-cli = "*"
+
+[environments]
+default = ["default", "repository"]
+self-hosted = ["default", "self-hosted"]
