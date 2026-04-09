@@ -1,6 +1,6 @@
 # Upload Package Action
 
-Upload conda or Python packages to Anaconda.org or Anaconda Repository (PSM/Anaconda Business).
+Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anaconda Business), or self-hosted Anaconda Platform.
 
 ## Inputs
 
@@ -9,8 +9,8 @@ Upload conda or Python packages to Anaconda.org or Anaconda Repository (PSM/Anac
 | `token` | API token for authentication | Yes | - |
 | `packages` | Path or glob pattern to package files | Yes | - |
 | `owner` | Package owner/channel (org name or channel) | Yes | - |
-| `target-type` | `anaconda.org` or `repository` | No | `anaconda.org` |
-| `repository-url` | URL of repository API (required for `repository` target) | No | - |
+| `target-type` | `anaconda.org`, `repository`, or `self-hosted` | No | `anaconda.org` |
+| `repository-url` | URL of repository API (required for `repository` and `self-hosted` targets) | No | - |
 | `package-type` | `conda` or `pypi` (auto-detected if not specified) | No | - |
 | `summary` | Package summary (anaconda.org only) | No | - |
 | `private` | Make package private (anaconda.org only) | No | `false` |
@@ -54,6 +54,20 @@ Upload conda or Python packages to Anaconda.org or Anaconda Repository (PSM/Anac
     packages: ./build/noarch/*.conda
     target-type: repository
     repository-url: https://pkgs.example.com/api/repo
+    package-type: conda
+```
+
+### Upload to self-hosted Anaconda Platform
+
+```yaml
+- name: Upload to self-hosted Anaconda Platform
+  uses: anaconda/github-actions/upload-package@v1
+  with:
+    token: ${{ secrets.AP_API_KEY }}
+    owner: my-channel
+    packages: ./build/noarch/*.conda
+    target-type: self-hosted
+    repository-url: https://anaconda.mycompany.com/api/repo
     package-type: conda
 ```
 

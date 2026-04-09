@@ -82,10 +82,33 @@ jobs:
           repository-url: ${{ vars.PSM_PKGS_INTERNAL_TEST_URL }}
           package-type: conda
 
+  test-self-hosted:
+    name: Test self-hosted upload
+    needs: build-test-package
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Download test package
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: test-conda-package
+          path: ./packages
+
+      - name: Upload to self-hosted
+        uses: ./upload-package
+        with:
+          token: ${{ secrets.AP_STAGING_API_KEY }}
+          owner: anaconda-cloud
+          packages: ./packages/*.conda
+          target-type: self-hosted
+          repository-url: ${{ vars.AP_STAGING_URL }}
+          package-type: conda
+
   check:
     name: Check
     if: always()
-    needs: [build-test-package, test-anaconda-org, test-repository]
+    needs: [build-test-package, test-anaconda-org, test-repository, test-self-hosted]
     runs-on: ubuntu-latest
     steps:
       - name: Decide whether all jobs succeeded

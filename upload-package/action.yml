@@ -1,5 +1,5 @@
 name: "Upload Package"
-description: "Upload conda or Python packages to Anaconda.org or Anaconda Repository (PSM)"
+description: "Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM), or self-hosted Anaconda Platform"
 author: "Anaconda"
 
 inputs:
@@ -13,11 +13,11 @@ inputs:
     description: "Package owner/channel (e.g., organization name or channel)"
     required: true
   target-type:
-    description: 'Upload target type: "anaconda.org" or "repository" (for PSM/Anaconda Business)'
+    description: 'Upload target type: "anaconda.org", "repository" (for PSM/Anaconda Business), or "self-hosted" (for self-hosted Anaconda Platform)'
     required: false
     default: "anaconda.org"
   repository-url:
-    description: 'URL of the repository API (required when target-type is "repository")'
+    description: 'URL of the repository API (required when target-type is "repository" or "self-hosted")'
     required: false
   package-type:
     description: 'Type of package: "conda" or "pypi" (auto-detected from file extension if not specified)'
@@ -46,6 +46,11 @@ runs:
       run: |
         if [ "${{ inputs.target-type }}" = "repository" ] && [ -z "${{ inputs.repository-url }}" ]; then
           echo "::error::repository-url is required when target-type is 'repository'"
+          exit 1
+        fi
+
+        if [ "${{ inputs.target-type }}" = "self-hosted" ] && [ -z "${{ inputs.repository-url }}" ]; then
+          echo "::error::repository-url is required when target-type is 'self-hosted'"
           exit 1
         fi
 
@@ -111,6 +116,33 @@ runs:
         fi
 
         pixi run conda repo \
+          --token "$UPLOAD_TOKEN" \
+          --site upload_target \
+          upload \
+          --channel "${{ inputs.owner }}" \
+          $FLAGS \
+          ${{ inputs.packages }}
+
+    - name: Upload to self-hosted
+      if: inputs.target-type == 'self-hosted'
+      shell: bash
+      env:
+        UPLOAD_TOKEN: ${{ inputs.token }}
+        PIXI_PROJECT_MANIFEST: ${{ github.action_path }}/pixi.toml
+      run: |
+        pixi run -e self-hosted anaconda repo config --set sites.upload_target.url "${{ inputs.repository-url }}"
+
+        FLAGS=""
+
+        if [ "${{ inputs.verbose }}" = "true" ]; then
+          FLAGS="$FLAGS --verbose"
+        fi
+
+        if [ -n "${{ inputs.package-type }}" ]; then
+          FLAGS="$FLAGS --package-type ${{ inputs.package-type }}"
+        fi
+
+        pixi run -e self-hosted anaconda repo \
           --token "$UPLOAD_TOKEN" \
           --site upload_target \
           upload \
