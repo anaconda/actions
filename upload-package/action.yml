@@ -130,7 +130,7 @@ runs:
         ANACONDA_AUTH_API_KEY: ${{ inputs.token }}
         PIXI_PROJECT_MANIFEST: ${{ github.action_path }}/pixi.toml
       run: |
-        pixi run -e self-hosted anaconda sites add --default --domain "${{ inputs.repository-url }}"
+        pixi run -e self-hosted anaconda sites add --default --domain "${{ inputs.repository-url }}" --yes
 
         FLAGS=""
 
