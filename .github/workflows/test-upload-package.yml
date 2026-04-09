@@ -14,17 +14,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup miniconda
-        uses: conda-incubator/setup-miniconda@v3
+      - name: Setup pixi
+        uses: prefix-dev/setup-pixi@v0.8.1
         with:
-          channels: defaults
-          auto-activate-base: true
+          pixi-version: v0.47.0
+          manifest-path: tests/pixi.toml
 
       - name: Build test conda package
-        shell: bash -el {0}
+        working-directory: tests
         run: |
-          conda install -y conda-build
-          conda build tests/test-package/recipe --output-folder ./build
+          pixi run rattler-build build \
+            --recipe test-package/recipe.yaml \
+            --output-dir ../build
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4

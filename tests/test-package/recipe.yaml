@@ -1,0 +1,23 @@
+package:
+  name: github-actions-test-package
+  version: "0.0.${{ env.get('GITHUB_RUN_NUMBER', '1') }}"
+
+build:
+  number: 0
+  noarch: python
+  script: echo "Test package installed"
+
+requirements:
+  host:
+    - python >=3.10
+  run:
+    - python >=3.10
+
+tests:
+  - script:
+      - echo "Test passed"
+
+about:
+  homepage: https://github.com/anaconda/github-actions
+  license: BSD-3-Clause
+  summary: Test package for validating the upload-package GitHub Action
