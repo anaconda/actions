@@ -51,9 +51,10 @@ jobs:
         uses: ./upload-package
         with:
           token: ${{ secrets.ANACONDA_ORG_TEST_TOKEN }}
-          owner: anaconda-github-actions-test
+          owner: anaconda-cloud
           packages: ./packages/*.conda
           force: true
+          private: true
 
   test-repository:
     name: Test repository upload
