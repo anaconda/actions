@@ -53,7 +53,6 @@ jobs:
           token: ${{ secrets.ANACONDA_ORG_TEST_TOKEN }}
           owner: anaconda-cloud
           packages: ./packages/*.conda
-          force: true
           private: true
 
   test-repository:
@@ -77,4 +76,3 @@ jobs:
           packages: ./packages/*.conda
           target-type: repository
           repository-url: ${{ vars.PSM_PKGS_INTERNAL_TEST_URL }}
-          force: false
