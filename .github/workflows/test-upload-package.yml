@@ -6,6 +6,7 @@ on:
       - "upload-package/**"
       - ".github/workflows/test-upload-package.yml"
       - "tests/**"
+  merge_group:
 
 permissions:
   contents: read
