@@ -16,8 +16,6 @@ Upload conda or Python packages to Anaconda.org or Anaconda Repository (PSM/Anac
 | `private` | Make package private (anaconda.org only) | No | `false` |
 | `force` | Overwrite existing packages | No | `false` |
 | `verbose` | Enable verbose output | No | `false` |
-| `cloudflare-client-id` | Cloudflare Access client ID | No | - |
-| `cloudflare-client-secret` | Cloudflare Access client secret | No | - |
 
 ## Usage
 
@@ -57,21 +55,6 @@ Upload conda or Python packages to Anaconda.org or Anaconda Repository (PSM/Anac
     target-type: repository
     repository-url: https://pkgs.example.com/api/repo
     package-type: conda
-```
-
-### Upload to Cloudflare-protected repository
-
-```yaml
-- name: Upload to internal PSM
-  uses: anaconda/github-actions/upload-package@v1
-  with:
-    token: ${{ secrets.PSM_TOKEN }}
-    owner: my-channel
-    packages: ./build/noarch/*.conda
-    target-type: repository
-    repository-url: https://pkgs.internal.example.com/api/repo
-    cloudflare-client-id: ${{ secrets.CF_CLIENT_ID }}
-    cloudflare-client-secret: ${{ secrets.CF_CLIENT_SECRET }}
 ```
 
 ## Full workflow example
