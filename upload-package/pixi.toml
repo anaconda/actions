@@ -7,3 +7,4 @@ platforms = ["linux-64", "osx-arm64"]
 conda = "=26.3.1"
 anaconda-client = "=1.14.1"
 conda-repo-cli = "=1.0.173"
+setuptools = "<72"
