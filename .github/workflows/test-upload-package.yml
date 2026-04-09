@@ -7,6 +7,9 @@ on:
       - ".github/workflows/test-upload-package.yml"
       - "tests/**"
 
+permissions:
+  contents: read
+
 jobs:
   build-test-package:
     name: Build test package
