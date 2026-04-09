@@ -1,6 +1,8 @@
+schema_version: 1
+
 package:
   name: github-actions-test-package
-  version: "0.0.${{ env.get('GITHUB_RUN_NUMBER', '1') }}"
+  version: "0.0.${{ env.get('GITHUB_RUN_NUMBER') or '1' }}"
 
 build:
   number: 0
