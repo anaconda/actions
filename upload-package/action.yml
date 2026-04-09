@@ -2,10 +2,6 @@ name: 'Upload Package'
 description: 'Upload conda or Python packages to Anaconda.org or Anaconda Repository (PSM)'
 author: 'Anaconda'
 
-branding:
-  icon: 'upload-cloud'
-  color: 'green'
-
 inputs:
   token:
     description: 'API token for authentication'
