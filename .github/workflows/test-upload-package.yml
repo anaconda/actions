@@ -70,10 +70,10 @@ jobs:
       - name: Upload to repository
         uses: ./upload-package
         with:
-          token: ${{ secrets.PSM_TEST_TOKEN }}
-          owner: github-actions-test
+          token: ${{ secrets.PSM_PKGS_INTERNAL_TEST_TOKEN }}
+          owner: anaconda-github-actions-test
           packages: ./packages/*.conda
           target-type: repository
-          repository-url: ${{ vars.PSM_TEST_URL }}
+          repository-url: ${{ vars.PSM_PKGS_INTERNAL_TEST_URL }}
           package-type: conda
           force: true
