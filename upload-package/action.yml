@@ -29,12 +29,19 @@ inputs:
     description: "Make package private (anaconda.org only)"
     required: false
     default: "false"
+  labels:
+    description: "Comma-separated list of labels to apply to the package (anaconda.org only, e.g., 'main,dev')"
+    required: false
   force:
     description: "Overwrite existing packages if they already exist"
     required: false
     default: "false"
   verbose:
     description: "Enable verbose output"
+    required: false
+    default: "false"
+  disable-new-cli:
+    description: "Disable new anaconda-client CLI parser (anaconda.org only)"
     required: false
     default: "false"
 
@@ -65,6 +72,7 @@ runs:
       shell: bash
       env:
         ANACONDA_API_TOKEN: ${{ inputs.token }}
+        ANACONDA_CLI_FORCE_NEW: ${{ inputs.disable-new-cli != 'true' && '1' || '' }}
         PIXI_PROJECT_MANIFEST: ${{ github.action_path }}/pixi.toml
       run: |
         FLAGS=""
@@ -88,6 +96,16 @@ runs:
         if [ -n "${{ inputs.package-type }}" ]; then
           FLAGS="$FLAGS --package-type ${{ inputs.package-type }}"
         fi
+
+        if [ -n "${{ inputs.labels }}" ]; then
+          IFS=',' read -ra LABELS <<< "${{ inputs.labels }}"
+          for label in "${LABELS[@]}"; do
+            FLAGS="$FLAGS --label $(echo "$label" | xargs)"
+          done
+        fi
+
+        # Show help for debugging purposes
+        pixi run anaconda org upload --help
 
         pixi run anaconda \
           --token "$ANACONDA_API_TOKEN" \
