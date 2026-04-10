@@ -2,9 +2,6 @@ name: Test upload-package action
 
 on:
   pull_request:
-    paths:
-      - "upload-package/**"
-      - ".github/workflows/test-upload-package.yml"
   merge_group:
 
 permissions:
