@@ -40,6 +40,10 @@ inputs:
     description: "Enable verbose output"
     required: false
     default: "false"
+  disable-new-cli:
+    description: "Disable new anaconda-client CLI parser (anaconda.org only)"
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
@@ -68,6 +72,7 @@ runs:
       shell: bash
       env:
         ANACONDA_API_TOKEN: ${{ inputs.token }}
+        ANACONDA_CLI_FORCE_NEW: ${{ inputs.disable-new-cli != 'true' && '1' || '' }}
         PIXI_PROJECT_MANIFEST: ${{ github.action_path }}/pixi.toml
       run: |
         FLAGS=""

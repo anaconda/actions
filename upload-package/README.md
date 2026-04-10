@@ -17,6 +17,7 @@ Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anacon
 | `labels` | Comma-separated labels (anaconda.org only, e.g., `main,dev`) | No | - |
 | `force` | Overwrite existing packages | No | `false` |
 | `verbose` | Enable verbose output | No | `false` |
+| `disable-new-cli` | Disable new anaconda-client CLI parser (anaconda.org only) | No | `false` |
 
 ## Usage
 
