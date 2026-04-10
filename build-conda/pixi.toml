@@ -1,5 +1,5 @@
 [workspace]
-name = "build-package-action"
+name = "build-conda-action"
 channels = ["https://repo.anaconda.com/pkgs/main"]
 platforms = ["linux-64", "osx-arm64"]
 

@@ -1,4 +1,4 @@
-# `build-package` — Spec
+# `build-conda` — Spec
 
 ## Overview
 
@@ -8,24 +8,24 @@ uses Anaconda's CBC, builds against `defaults` channel.
 
 ```yaml
 # Zero-config: finds recipe, uses Anaconda CBC, builds against defaults
-- uses: anaconda/github-actions/build-package@v1
+- uses: anaconda/github-actions/build-conda@v1
 ```
 
 ```yaml
 # Override what you need, leave the rest
-- uses: anaconda/github-actions/build-package@v1
+- uses: anaconda/github-actions/build-conda@v1
   with:
     cbc-preset: conda-forge
 
 # Or layer your own tweaks on top of Anaconda's CBC
-- uses: anaconda/github-actions/build-package@v1
+- uses: anaconda/github-actions/build-conda@v1
   with:
     cbc: ./my-overrides.yaml
 ```
 
 ```yaml
 # Full build + upload workflow
-- uses: anaconda/github-actions/build-package@v1
+- uses: anaconda/github-actions/build-conda@v1
 - uses: anaconda/github-actions/upload-package@v1
   with:
     token: ${{ secrets.ANACONDA_TOKEN }}
@@ -193,51 +193,51 @@ INT-1: Zero-config build
        → .conda file exists in ./build/
 
 INT-2: Build with conda-forge preset
-       - uses: build-package with cbc-preset=conda-forge, channels=conda-forge
+       - uses: build-conda with cbc-preset=conda-forge, channels=conda-forge
        → .conda file exists in ./build/
 
 INT-3: Build with custom CBC override (URL)
-       - uses: build-package with cbc=<URL to aggregate CBC>
+       - uses: build-conda with cbc=<URL to aggregate CBC>
        → .conda file exists in ./build/
 
 INT-4: Build with local CBC override
-       - Repo has build-package/tests/test-cbc-override/cbc-overrides.yaml
-       - uses: build-package with cbc=build-package/tests/test-cbc-override/cbc-overrides.yaml
+       - Repo has build-conda/tests/test-cbc-override/cbc-overrides.yaml
+       - uses: build-conda with cbc=build-conda/tests/test-cbc-override/cbc-overrides.yaml
        → .conda file exists in ./build/
 
 INT-5: Build + upload workflow
-       - build-package → upload-package
+       - build-conda → upload-package
        → package uploaded to anaconda.org test channel
 
 INT-6: Build compiled package — verify CBC pins flow through (anaconda preset)
        - Test recipe: C extension with {{ compiler('c') }} and numpy host dep
-       - uses: build-package (default anaconda preset)
+       - uses: build-conda (default anaconda preset)
        → .conda file exists; info/recipe/conda_build_config.yaml inside package
          reflects anaconda CBC pins
 
 INT-6b: Same compiled recipe — conda-forge preset
-       - uses: build-package with cbc-preset=conda-forge, channels=conda-forge
+       - uses: build-conda with cbc-preset=conda-forge, channels=conda-forge
        → .conda file exists; CBC pins reflect conda-forge values
 
 INT-6c: Same compiled recipe — anaconda preset + local override
        - Local CBC overrides numpy pin to a specific version
-       - uses: build-package with cbc=./cbc-overrides.yaml
+       - uses: build-conda with cbc=./cbc-overrides.yaml
        → .conda file exists; compiler from anaconda preset, numpy pin from override
 
 INT-6d: Same compiled recipe — conda-forge preset + local override
-       - uses: build-package with cbc-preset=conda-forge, cbc=./cbc-overrides.yaml, channels=conda-forge
+       - uses: build-conda with cbc-preset=conda-forge, cbc=./cbc-overrides.yaml, channels=conda-forge
        → .conda file exists; compiler from conda-forge, numpy pin from override
 
 INT-6e: Same compiled recipe — cbc-preset=none + local CBC only
-       - uses: build-package with cbc-preset=none, cbc=./full-cbc.yaml
+       - uses: build-conda with cbc-preset=none, cbc=./full-cbc.yaml
        → .conda file exists; no preset values leak through
 
 INT-7: Multi-python build
-       - uses: build-package with python-version="3.11,3.12"
+       - uses: build-conda with python-version="3.11,3.12"
        → .conda files exist for both python versions in ./build/
 
 INT-8: Custom conda-build version
-       - uses: build-package with conda-build-version="24.9.0"
+       - uses: build-conda with conda-build-version="24.9.0"
        → build succeeds; conda-build --version confirms correct version
 
 INT-9: Recipe auto-discovery

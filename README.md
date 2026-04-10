@@ -4,25 +4,25 @@ Reusable GitHub Actions for Anaconda customers.
 
 ## Available Actions
 
-### [build-package](./build-package)
+### [build-conda](./build-conda)
 
 Build conda packages with conda-build. Zero required inputs — auto-discovers your recipe and uses Anaconda's CBC by default.
 
 **Zero-config build:**
 ```yaml
-- uses: anaconda/github-actions/build-package@v1
+- uses: anaconda/github-actions/build-conda@v1
 ```
 
 **Build with conda-forge pins:**
 ```yaml
-- uses: anaconda/github-actions/build-package@v1
+- uses: anaconda/github-actions/build-conda@v1
   with:
     cbc-preset: conda-forge
 ```
 
 **Full build + upload workflow:**
 ```yaml
-- uses: anaconda/github-actions/build-package@v1
+- uses: anaconda/github-actions/build-conda@v1
 - uses: anaconda/github-actions/upload-package@v1
   with:
     token: ${{ secrets.ANACONDA_TOKEN }}
@@ -30,7 +30,7 @@ Build conda packages with conda-build. Zero required inputs — auto-discovers y
     packages: ./build/**/*.conda
 ```
 
-See the [build-package README](./build-package/README.md) for full documentation.
+See the [build-conda README](./build-conda/README.md) for full documentation.
 
 ### [upload-package](./upload-package)
 

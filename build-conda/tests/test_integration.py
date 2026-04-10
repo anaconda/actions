@@ -2,7 +2,7 @@
 Integration tests for build.py — these actually invoke conda-build.
 
 Run with:
-    cd build-package && pixi run -e integration pytest tests/test_integration.py -v
+    cd build-conda && pixi run -e integration pytest tests/test_integration.py -v
 
 Requires the integration pixi environment (conda-build + pytest).  All tests
 that avoid the network use cbc-preset=none with a local CBC file so they are
@@ -19,7 +19,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-# The integration tests live at build-package/tests/test_integration.py.
+# The integration tests live at build-conda/tests/test_integration.py.
 # Recipes live at <repo-root>/tests/{test-package,test-compiled}.
 REPO_ROOT = Path(__file__).parent.parent.parent
 
@@ -86,7 +86,7 @@ def run_build(
 class TestBuilds:
     def test_noarch_package_builds(self, monkeypatch, tmp_path):
         """The noarch test recipe produces at least one .conda file."""
-        out = run_build(monkeypatch, tmp_path, "build-package/tests/test-package", preset="none")
+        out = run_build(monkeypatch, tmp_path, "build-conda/tests/test-package", preset="none")
         packages = list(out.rglob("*.conda")) + list(out.rglob("*.tar.bz2"))
         assert len(packages) >= 1, f"No packages found under {out}"
 
@@ -98,9 +98,9 @@ class TestBuilds:
         out = run_build(
             monkeypatch,
             tmp_path,
-            "build-package/tests/test-compiled",
+            "build-conda/tests/test-compiled",
             preset="none",
-            cbc="build-package/tests/test-cbc-override/cbc-overrides.yaml",
+            cbc="build-conda/tests/test-cbc-override/cbc-overrides.yaml",
             python_version="3.12",
         )
         packages = list(out.rglob("*.conda")) + list(out.rglob("*.tar.bz2"))
@@ -108,7 +108,7 @@ class TestBuilds:
 
     def test_github_output_written(self, monkeypatch, tmp_path):
         """main() writes packages=<output-dir> to $GITHUB_OUTPUT."""
-        out = run_build(monkeypatch, tmp_path, "build-package/tests/test-package", preset="none")
+        out = run_build(monkeypatch, tmp_path, "build-conda/tests/test-package", preset="none")
         github_output = tmp_path / "github_output.txt"
         assert github_output.exists()
         content = github_output.read_text()
@@ -123,7 +123,7 @@ class TestBuilds:
 
 
 class TestCbcPropagation:
-    CBC_OVERRIDE = "build-package/tests/test-cbc-override/cbc-overrides.yaml"
+    CBC_OVERRIDE = "build-conda/tests/test-cbc-override/cbc-overrides.yaml"
 
     def test_local_cbc_override_reaches_compiled_package(self, monkeypatch, tmp_path):
         """
@@ -136,7 +136,7 @@ class TestCbcPropagation:
         out = run_build(
             monkeypatch,
             tmp_path,
-            "build-package/tests/test-compiled",
+            "build-conda/tests/test-compiled",
             preset="none",
             cbc=self.CBC_OVERRIDE,
             python_version="3.12",
@@ -168,11 +168,11 @@ class TestCbcPropagation:
         test_local_cbc_override_reaches_compiled_package is testing something
         meaningful and not passing by coincidence.
         """
-        CBC_OVERRIDE_2 = "build-package/tests/test-cbc-override-2/cbc-overrides-2.yaml"
+        CBC_OVERRIDE_2 = "build-conda/tests/test-cbc-override-2/cbc-overrides-2.yaml"
         out = run_build(
             monkeypatch,
             tmp_path,
-            "build-package/tests/test-compiled",
+            "build-conda/tests/test-compiled",
             preset="none",
             cbc=CBC_OVERRIDE_2,
             python_version="3.12",

@@ -1,4 +1,4 @@
-name: "Build Package"
+name: "Build Conda Package"
 description: "Build a conda package with conda-build against a conda_build_config.yaml (CBC)"
 author: "Anaconda"
 

@@ -1,4 +1,4 @@
-# SDD: `build-package` GitHub Action
+# SDD: `build-conda` GitHub Action
 
 > **This document has been superseded.**
-> The maintained spec lives at [`build-package/SPEC.md`](../build-package/SPEC.md).
+> The maintained spec lives at [`build-conda/SPEC.md`](../build-conda/SPEC.md).

@@ -1,5 +1,5 @@
 """
-build.py — conda-build runner for the build-package GitHub Action.
+build.py — conda-build runner for the build-conda GitHub Action.
 
 All public functions take plain Python types (str, Path, list) so they can be
 exercised in unit tests without touching conda-build or the network.
