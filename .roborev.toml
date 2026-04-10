@@ -1,0 +1,22 @@
+review_guidelines = '''Review this PR against the spec at build-package/SPEC.md.
+
+  The spec is the source of truth for what this action should do. For each behavioral
+  assertion (D1-D5, R1-R9, C1-C4, B1-B6, V1-V3, O1-O2):
+  - Does the implementation satisfy it?
+  - If not, what's wrong?
+
+  The spec might be wrong — if an assertion doesn't make sense or conflicts with how
+  conda-build actually works, flag it. But assume the spec is probably right.
+
+  The integration tests (INT-1 through INT-11) should cover the behavioral assertions. Flag
+  any assertions that aren't tested.
+
+  Do NOT suggest:
+  - Code style changes, refactoring, or "improvements" beyond what the spec requires
+  - Additional error handling for cases not in the spec
+  - Abstracting things into separate files or scripts unless the current approach is broken
+
+  The upload-package action in this repo is the reference for patterns (composite action,
+  pixi, flag accumulation in bash). Match those patterns.
+
+Only report findings that would cause a bug, data loss, or security issue in production. Do not report: hypothetical edge cases that cannot occur in the actual deployment context, style or naming nits, missing tests for unlikely code paths, theoretical thread-safety issues in single-threaded code, or suggestions to add defensive code for scenarios the architecture prevents. Severity MEDIUM or higher only.'''
