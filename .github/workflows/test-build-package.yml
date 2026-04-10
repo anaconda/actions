@@ -6,7 +6,6 @@ on:
       - "build-package/**"
       - "upload-package/**"
       - ".github/workflows/test-build-package.yml"
-      - "tests/**"
   merge_group:
 
 permissions:
@@ -23,7 +22,7 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Set up recipe for auto-discovery
-        run: cp -r tests/test-package conda.recipe
+        run: cp -r build-package/tests/test-package conda.recipe
 
       - name: Build (no inputs — should discover conda.recipe/)
         uses: ./build-package
@@ -50,7 +49,7 @@ jobs:
       - name: Build with conda-forge preset
         uses: ./build-package
         with:
-          recipe: tests/test-package
+          recipe: build-package/tests/test-package
           cbc-preset: conda-forge
           channels: conda-forge
 
@@ -76,7 +75,7 @@ jobs:
       - name: Build with custom CBC URL
         uses: ./build-package
         with:
-          recipe: tests/test-package
+          recipe: build-package/tests/test-package
           cbc: https://raw.githubusercontent.com/AnacondaRecipes/aggregate/main/conda_build_config.yaml
 
       - name: Verify .conda file exists
@@ -100,8 +99,8 @@ jobs:
       - name: Build with local CBC override
         uses: ./build-package
         with:
-          recipe: tests/test-package
-          cbc: tests/test-cbc-override/cbc-overrides.yaml
+          recipe: build-package/tests/test-package
+          cbc: build-package/tests/test-cbc-override/cbc-overrides.yaml
 
       - name: Verify .conda file exists
         run: |
@@ -124,7 +123,7 @@ jobs:
       - name: Build compiled package (anaconda preset)
         uses: ./build-package
         with:
-          recipe: tests/test-compiled
+          recipe: build-package/tests/test-compiled
 
       - name: Verify CBC pins propagated (anaconda preset)
         env:
@@ -132,7 +131,7 @@ jobs:
         run: |
           # Assert numpy is present in the embedded CBC and print the full config.
           # The value should reflect Anaconda's preset pin, not conda-build's default.
-          pixi run python tests/check_cbc.py \
+          pixi run python build-package/tests/check_cbc.py \
             --package "./build/**/*.conda" \
             --assert-key numpy \
             --print
@@ -149,7 +148,7 @@ jobs:
       - name: Build compiled package (conda-forge preset)
         uses: ./build-package
         with:
-          recipe: tests/test-compiled
+          recipe: build-package/tests/test-compiled
           cbc-preset: conda-forge
           channels: conda-forge
 
@@ -159,7 +158,7 @@ jobs:
         run: |
           # Assert numpy is present in the embedded CBC and print the full config.
           # The value should reflect conda-forge's preset pin, not conda-build's default.
-          pixi run python tests/check_cbc.py \
+          pixi run python build-package/tests/check_cbc.py \
             --package "./build/**/*.conda" \
             --assert-key numpy \
             --print
@@ -176,8 +175,8 @@ jobs:
       - name: Build compiled package (anaconda preset + local override)
         uses: ./build-package
         with:
-          recipe: tests/test-compiled
-          cbc: tests/test-cbc-override/cbc-overrides.yaml
+          recipe: build-package/tests/test-compiled
+          cbc: build-package/tests/test-cbc-override/cbc-overrides.yaml
 
       - name: Verify numpy override propagated (anaconda preset + 1.26.* override)
         env:
@@ -185,7 +184,7 @@ jobs:
         run: |
           # cbc-overrides.yaml sets numpy to 1.26.*.  Assert that value made it
           # into the embedded CBC, proving the custom cbc layered on top of the preset.
-          pixi run python tests/check_cbc.py \
+          pixi run python build-package/tests/check_cbc.py \
             --package "./build/**/*.conda" \
             --assert-key numpy \
             --contains 1.26 \
@@ -203,9 +202,9 @@ jobs:
       - name: Build compiled package (conda-forge preset + local override)
         uses: ./build-package
         with:
-          recipe: tests/test-compiled
+          recipe: build-package/tests/test-compiled
           cbc-preset: conda-forge
-          cbc: tests/test-cbc-override/cbc-overrides.yaml
+          cbc: build-package/tests/test-cbc-override/cbc-overrides.yaml
           channels: conda-forge
 
       - name: Verify numpy override propagated (conda-forge preset + 1.26.* override)
@@ -214,7 +213,7 @@ jobs:
         run: |
           # cbc-overrides.yaml sets numpy to 1.26.*.  Assert that value made it
           # into the embedded CBC, proving the custom cbc layered on top of conda-forge.
-          pixi run python tests/check_cbc.py \
+          pixi run python build-package/tests/check_cbc.py \
             --package "./build/**/*.conda" \
             --assert-key numpy \
             --contains 1.26 \
@@ -232,9 +231,9 @@ jobs:
       - name: Build compiled package (no preset, local CBC only)
         uses: ./build-package
         with:
-          recipe: tests/test-compiled
+          recipe: build-package/tests/test-compiled
           cbc-preset: none
-          cbc: tests/test-cbc-override/cbc-overrides.yaml
+          cbc: build-package/tests/test-cbc-override/cbc-overrides.yaml
           python-version: "3.12"
 
       - name: Verify numpy from local-only CBC propagated (cbc-preset=none)
@@ -245,7 +244,7 @@ jobs:
           # The absence of preset values is guaranteed structurally: resolve_cbc() with
           # preset=none passes no preset file to --variant-config-files (covered by unit
           # tests). Here we confirm the override value (1.26.*) is present in the output.
-          pixi run python tests/check_cbc.py \
+          pixi run python build-package/tests/check_cbc.py \
             --package "./build/**/*.conda" \
             --assert-key numpy \
             --contains 1.26 \
@@ -263,7 +262,7 @@ jobs:
       - name: Build compiled package for python 3.11 and 3.12
         uses: ./build-package
         with:
-          recipe: tests/test-compiled
+          recipe: build-package/tests/test-compiled
           python-version: "3.11,3.12"
 
       - name: Verify packages exist for both python versions
@@ -288,7 +287,7 @@ jobs:
       - name: Build with specific conda-build version
         uses: ./build-package
         with:
-          recipe: tests/test-package
+          recipe: build-package/tests/test-package
           conda-build-version: "24.9.0"
 
       - name: Verify conda-build version used
@@ -343,8 +342,8 @@ jobs:
 
       - name: Set up multiple recipe directories
         run: |
-          cp -r tests/test-package conda.recipe
-          cp -r tests/test-package recipe
+          cp -r build-package/tests/test-package conda.recipe
+          cp -r build-package/tests/test-package recipe
 
       - name: Build (ambiguous recipe — should fail)
         id: build
@@ -371,7 +370,7 @@ jobs:
       - name: Build test package
         uses: ./build-package
         with:
-          recipe: tests/test-package
+          recipe: build-package/tests/test-package
 
       - name: Upload to anaconda.org
         uses: ./upload-package

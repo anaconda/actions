@@ -201,8 +201,8 @@ INT-3: Build with custom CBC override (URL)
        → .conda file exists in ./build/
 
 INT-4: Build with local CBC override
-       - Repo has tests/test-cbc-override/cbc-overrides.yaml
-       - uses: build-package with cbc=tests/test-cbc-override/cbc-overrides.yaml
+       - Repo has build-package/tests/test-cbc-override/cbc-overrides.yaml
+       - uses: build-package with cbc=build-package/tests/test-cbc-override/cbc-overrides.yaml
        → .conda file exists in ./build/
 
 INT-5: Build + upload workflow
