@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "build-package/**"
+      - "upload-package/**"
       - ".github/workflows/test-build-package.yml"
       - "tests/**"
   merge_group:
@@ -356,6 +357,29 @@ jobs:
           echo "Correctly failed when multiple recipes were found"
 
   # ──────────────────────────────────────────────────────────
+  # INT-5: Build + upload end-to-end
+  # ──────────────────────────────────────────────────────────
+  test-build-and-upload:
+    name: "INT-5: build + upload (anaconda.org)"
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Build test package
+        uses: ./build-package
+        with:
+          recipe: tests/test-package
+
+      - name: Upload to anaconda.org
+        uses: ./upload-package
+        with:
+          token: ${{ secrets.ANACONDA_ORG_TEST_TOKEN }}
+          owner: anaconda-cloud
+          packages: ./build/**/*.conda
+          private: true
+          labels: "main,dev"
+
+  # ──────────────────────────────────────────────────────────
   # Aggregate check
   # ──────────────────────────────────────────────────────────
   check:
@@ -375,6 +399,7 @@ jobs:
       - test-custom-conda-build-version
       - test-discovery-failure
       - test-discovery-ambiguity
+      - test-build-and-upload
     runs-on: ubuntu-latest
     steps:
       - name: Decide whether all jobs succeeded
