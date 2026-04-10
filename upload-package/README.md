@@ -14,6 +14,7 @@ Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anacon
 | `package-type` | `conda` or `pypi` (auto-detected if not specified) | No | - |
 | `summary` | Package summary (anaconda.org only) | No | - |
 | `private` | Make package private (anaconda.org only) | No | `false` |
+| `labels` | Comma-separated labels (anaconda.org only, e.g., `main,dev`) | No | - |
 | `force` | Overwrite existing packages | No | `false` |
 | `verbose` | Enable verbose output | No | `false` |
 
@@ -41,6 +42,7 @@ Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anacon
     packages: ./dist/*.whl
     summary: "My package description"
     private: true
+    labels: "main,dev"
 ```
 
 ### Upload to Anaconda Repository (PSM)

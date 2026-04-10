@@ -29,6 +29,9 @@ inputs:
     description: "Make package private (anaconda.org only)"
     required: false
     default: "false"
+  labels:
+    description: "Comma-separated list of labels to apply to the package (anaconda.org only, e.g., 'main,dev')"
+    required: false
   force:
     description: "Overwrite existing packages if they already exist"
     required: false
@@ -87,6 +90,13 @@ runs:
 
         if [ -n "${{ inputs.package-type }}" ]; then
           FLAGS="$FLAGS --package-type ${{ inputs.package-type }}"
+        fi
+
+        if [ -n "${{ inputs.labels }}" ]; then
+          IFS=',' read -ra LABELS <<< "${{ inputs.labels }}"
+          for label in "${LABELS[@]}"; do
+            FLAGS="$FLAGS --label $(echo "$label" | xargs)"
+          done
         fi
 
         pixi run anaconda \
