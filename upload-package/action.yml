@@ -104,6 +104,9 @@ runs:
           done
         fi
 
+        # Show help for debugging purposes
+        pixi run anaconda org upload --help
+
         pixi run anaconda \
           --token "$ANACONDA_API_TOKEN" \
           upload \
