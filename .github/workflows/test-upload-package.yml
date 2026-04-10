@@ -58,6 +58,7 @@ jobs:
           owner: anaconda-cloud
           packages: ./packages/*.conda
           private: true
+          labels: "main,dev"
 
   test-repository:
     name: Test repository upload
