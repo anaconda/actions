@@ -1,0 +1,32 @@
+package:
+  name: test-compiled
+  version: "0.0.1"
+
+source:
+  path: .
+
+build:
+  number: 0
+  script: $PYTHON setup.py install --single-version-externally-managed --record=record.txt
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+  host:
+    - python
+    - setuptools
+    - numpy
+  run:
+    - python
+    - {{ pin_compatible('numpy') }}
+
+test:
+  imports:
+    - hello
+  commands:
+    - python -c "import hello; print(hello.say_hello())"
+
+about:
+  homepage: https://github.com/anaconda/github-actions
+  license: BSD-3-Clause
+  summary: Compiled C extension test package for validating CBC pin flow through build-package action

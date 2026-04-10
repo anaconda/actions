@@ -1,0 +1,67 @@
+name: "Build Package"
+description: "Build a conda package with conda-build against a conda_build_config.yaml (CBC)"
+author: "Anaconda"
+
+inputs:
+  recipe:
+    description: "Path to the conda recipe directory. Auto-discovered if omitted."
+    required: false
+  cbc-preset:
+    description: 'Built-in CBC preset: "anaconda" (default), "conda-forge", or "none"'
+    required: false
+    default: "anaconda"
+  cbc:
+    description: "URL or local path to a conda_build_config.yaml. Merged on top of cbc-preset (overrides matching keys)."
+    required: false
+  channels:
+    description: "Comma-separated list of conda channels. If omitted, inferred from preset (anaconda→defaults, conda-forge→conda-forge)."
+    required: false
+  python-version:
+    description: "Python version(s) to build for. Single ('3.12') or comma-separated ('3.11,3.12,3.13')."
+    required: false
+  conda-build-version:
+    description: "Version of conda-build to use (e.g., '24.11.2'). If omitted, uses the action's pinned default."
+    required: false
+  output-dir:
+    description: "Output directory for built packages"
+    required: false
+    default: "./build"
+  verbose:
+    description: "Enable verbose conda-build output"
+    required: false
+    default: "false"
+
+outputs:
+  packages:
+    description: "Path to directory containing built package files"
+    value: ${{ steps.build.outputs.packages }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@1b2de7f3351f171c8b4dfeb558c639cb58ed4ec0 # v0.9.5
+      with:
+        pixi-version: v0.67.0
+        manifest-path: ${{ github.action_path }}/pixi.toml
+
+    - name: Override conda-build version
+      if: inputs.conda-build-version != ''
+      shell: bash
+      env:
+        PIXI_PROJECT_MANIFEST: ${{ github.action_path }}/pixi.toml
+      run: pixi add "conda-build=${{ inputs.conda-build-version }}"
+
+    - name: Build package
+      id: build
+      shell: bash
+      env:
+        PIXI_PROJECT_MANIFEST: ${{ github.action_path }}/pixi.toml
+        INPUT_RECIPE: ${{ inputs.recipe }}
+        INPUT_CBC_PRESET: ${{ inputs.cbc-preset }}
+        INPUT_CBC: ${{ inputs.cbc }}
+        INPUT_CHANNELS: ${{ inputs.channels }}
+        INPUT_PYTHON_VERSION: ${{ inputs.python-version }}
+        INPUT_OUTPUT_DIR: ${{ inputs.output-dir }}
+        INPUT_VERBOSE: ${{ inputs.verbose }}
+      run: pixi run python "${{ github.action_path }}/build.py"

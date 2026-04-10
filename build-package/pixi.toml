@@ -1,0 +1,22 @@
+[workspace]
+name = "build-package-action"
+channels = ["https://repo.anaconda.com/pkgs/main"]
+platforms = ["linux-64", "osx-arm64"]
+
+[dependencies]
+conda = "=26.3.1"
+conda-build = ">=24.11"
+
+[feature.test.dependencies]
+pytest = "*"
+pyyaml = "*"
+
+# Integration environment: conda-build (from base) + pytest, so tests can
+# call build.main() and actually invoke conda-build end-to-end.
+[feature.integration.dependencies]
+pytest = "*"
+
+[environments]
+default = { features = [] }
+test = { features = ["test"] }
+integration = { features = ["integration"] }

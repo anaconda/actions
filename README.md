@@ -4,6 +4,34 @@ Reusable GitHub Actions for Anaconda customers.
 
 ## Available Actions
 
+### [build-package](./build-package)
+
+Build conda packages with conda-build. Zero required inputs — auto-discovers your recipe and uses Anaconda's CBC by default.
+
+**Zero-config build:**
+```yaml
+- uses: anaconda/github-actions/build-package@v1
+```
+
+**Build with conda-forge pins:**
+```yaml
+- uses: anaconda/github-actions/build-package@v1
+  with:
+    cbc-preset: conda-forge
+```
+
+**Full build + upload workflow:**
+```yaml
+- uses: anaconda/github-actions/build-package@v1
+- uses: anaconda/github-actions/upload-package@v1
+  with:
+    token: ${{ secrets.ANACONDA_TOKEN }}
+    owner: my-channel
+    packages: ./build/**/*.conda
+```
+
+See the [build-package README](./build-package/README.md) for full documentation.
+
 ### [upload-package](./upload-package)
 
 Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anaconda Business), or self-hosted Anaconda Platform.
