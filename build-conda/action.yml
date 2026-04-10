@@ -45,6 +45,14 @@ runs:
         pixi-version: v0.67.0
         manifest-path: ${{ github.action_path }}/pixi.toml
 
+    # NOTE: `pixi add` mutates pixi.toml and pixi.lock in-place. This is safe
+    # on ephemeral runners (fresh workspace per job) but will race on persistent
+    # shared runners where concurrent jobs pass different conda-build-version
+    # values. Fix when needed: copy pixi.toml + pixi.lock to a job-specific
+    # temp dir, run `pixi add` there, and export PIXI_PROJECT_MANIFEST via
+    # GITHUB_ENV so the build step picks up the copy. Remove the explicit
+    # PIXI_PROJECT_MANIFEST from the build step's env: block (it would override
+    # GITHUB_ENV) and set the default path in an earlier unconditional step.
     - name: Override conda-build version
       if: inputs.conda-build-version != ''
       shell: bash
