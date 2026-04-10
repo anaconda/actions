@@ -55,6 +55,7 @@ jobs:
           packages: ./packages/*.conda
           private: true
           labels: "main,dev"
+          verbose: true
 
   test-repository:
     name: Test repository upload
@@ -78,6 +79,7 @@ jobs:
           target-type: repository
           repository-url: ${{ vars.PSM_PKGS_INTERNAL_TEST_URL }}
           package-type: conda
+          verbose: true
 
   test-self-hosted:
     name: Test self-hosted upload
@@ -101,6 +103,7 @@ jobs:
           target-type: self-hosted
           repository-url: ${{ vars.AP_STAGING_URL }}
           package-type: conda
+          verbose: true
 
   check:
     name: Check
