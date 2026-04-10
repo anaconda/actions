@@ -9,4 +9,4 @@ lock-upload-package:
 
 ## Generate lockfile for test build environment
 lock-tests:
-	cd tests && pixi lock
+	cd upload-package/tests && pixi lock
