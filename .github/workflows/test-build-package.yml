@@ -235,13 +235,16 @@ jobs:
           recipe: tests/test-compiled
           cbc-preset: none
           cbc: tests/test-cbc-override/cbc-overrides.yaml
+          python-version: "3.12"
 
       - name: Verify numpy from local-only CBC propagated (cbc-preset=none)
         env:
           PIXI_PROJECT_MANIFEST: build-package/pixi.toml
         run: |
-          # No preset — everything must come from cbc-overrides.yaml.
-          # Assert numpy is 1.26.* and that no other preset values leaked through.
+          # Verify the local CBC override reached the embedded conda_build_config.yaml.
+          # The absence of preset values is guaranteed structurally: resolve_cbc() with
+          # preset=none passes no preset file to --variant-config-files (covered by unit
+          # tests). Here we confirm the override value (1.26.*) is present in the output.
           pixi run python tests/check_cbc.py \
             --package "./build/**/*.conda" \
             --assert-key numpy \
