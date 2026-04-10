@@ -2,10 +2,6 @@ name: Test upload-package action
 
 on:
   pull_request:
-    paths:
-      - "upload-package/**"
-      - ".github/workflows/test-upload-package.yml"
-      - "tests/**"
   merge_group:
 
 permissions:
@@ -109,7 +105,8 @@ jobs:
   check:
     name: Check
     if: always()
-    needs: [build-test-package, test-anaconda-org, test-repository, test-self-hosted]
+    needs:
+      [build-test-package, test-anaconda-org, test-repository, test-self-hosted]
     runs-on: ubuntu-latest
     steps:
       - name: Decide whether all jobs succeeded
