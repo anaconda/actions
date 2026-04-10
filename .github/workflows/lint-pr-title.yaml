@@ -10,6 +10,9 @@ on:
       - reopened
       - synchronize
 
+permissions:
+  contents: read
+
 # Allow each opened PRs to validate titles concurrently
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
