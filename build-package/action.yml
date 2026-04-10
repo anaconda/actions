@@ -50,7 +50,8 @@ runs:
       shell: bash
       env:
         PIXI_PROJECT_MANIFEST: ${{ github.action_path }}/pixi.toml
-      run: pixi add "conda-build=${{ inputs.conda-build-version }}"
+        CONDA_BUILD_VERSION: ${{ inputs.conda-build-version }}
+      run: pixi add "conda-build=${CONDA_BUILD_VERSION}"
 
     - name: Build package
       id: build
