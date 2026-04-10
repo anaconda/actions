@@ -18,10 +18,10 @@ jobs:
         uses: prefix-dev/setup-pixi@1b2de7f3351f171c8b4dfeb558c639cb58ed4ec0 # v0.9.5
         with:
           pixi-version: v0.67.0
-          manifest-path: tests/pixi.toml
+          manifest-path: upload-package/tests/pixi.toml
 
       - name: Build test conda package
-        working-directory: tests
+        working-directory: upload-package/tests
         run: |
           pixi run rattler-build build \
             --recipe test-package/recipe.yaml \
@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: test-conda-package
-          path: ./build/noarch/*.conda
+          path: ./upload-package/build/noarch/*.conda
           if-no-files-found: error
 
   test-anaconda-org:
