@@ -4,6 +4,18 @@ Reusable GitHub Actions for Anaconda customers.
 
 ## Available Actions
 
+### [setup-ana](./setup-ana)
+
+Install the ana CLI and optional tools (anaconda-cli, pixi, etc.) in GitHub Actions.
+
+```yaml
+- uses: anaconda/github-actions/setup-ana@v1
+  with:
+    tools: anaconda-cli, pixi
+```
+
+See the [setup-ana README](./setup-ana/README.md) for full documentation.
+
 ### [upload-package](./upload-package)
 
 Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anaconda Business), or self-hosted Anaconda Platform.
