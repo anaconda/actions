@@ -38,6 +38,7 @@ runs:
         ANA_FORCE_INSTALL: "1"
         GITHUB_TOKEN: ${{ inputs.github-token }}
       run: |
+        # TODO(mattkram): This URL needs to be updated once it's available on a static URL
         # Download and run the install script (use GitHub API for private repo support)
         curl -fsSL \
           -H "Authorization: token $GITHUB_TOKEN" \
