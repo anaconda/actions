@@ -33,7 +33,7 @@ jobs:
         run: pixi --version
 
       - name: Smoke test pixi
-        run: pixi exec python -- -c "print('Hello from pixi!')"
+        run: pixi exec -- python -c "print('Hello from pixi!')"
 
   check:
     name: Check
