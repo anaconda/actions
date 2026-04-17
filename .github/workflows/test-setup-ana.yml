@@ -1,0 +1,45 @@
+name: Test setup-ana action
+
+on:
+  pull_request:
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Setup ana with pixi
+        id: setup-ana
+        uses: ./setup-ana
+        with:
+          tools: pixi
+
+      - name: Verify ana is installed
+        run: ana --version
+
+      - name: Verify pixi is installed
+        run: pixi --version
+
+      - name: Smoke test pixi
+        run: pixi exec python -- -c "print('Hello from pixi!')"
+
+  check:
+    name: Check
+    if: always()
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide whether all jobs succeeded
+        uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe # v1.2.2
+        with:
+          jobs: ${{ toJSON(needs) }}
