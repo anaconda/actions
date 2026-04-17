@@ -22,7 +22,6 @@ jobs:
         id: setup-ana
         uses: ./setup-ana
         with:
-          ana-version: v0.0.8.dev12
           tools: pixi
           github-token: ${{ secrets.ANA_CLI_TOKEN }}
 
