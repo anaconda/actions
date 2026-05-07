@@ -126,6 +126,7 @@ jobs:
           packages: ./packages/*.conda
           private: true
           labels: "main,dev"
+          force: true
           verbose: true
 
       - name: Second upload (repository) — must not fail on pixi re-install
