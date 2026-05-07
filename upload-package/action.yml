@@ -64,7 +64,21 @@ runs:
           exit 1
         fi
 
+    # setup-pixi fails if ~/.pixi/bin/pixi already exists, which happens when
+    # this action is used more than once in the same job. Skip setup if pixi
+    # is already on PATH — pixi run will resolve the env from PIXI_PROJECT_MANIFEST.
+    - name: Check for existing pixi
+      id: pixi-check
+      shell: bash
+      run: |
+        if command -v pixi >/dev/null 2>&1; then
+          echo "installed=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "installed=false" >> "$GITHUB_OUTPUT"
+        fi
+
     - name: Setup pixi
+      if: steps.pixi-check.outputs.installed != 'true'
       uses: prefix-dev/setup-pixi@1b2de7f3351f171c8b4dfeb558c639cb58ed4ec0 # v0.9.5
       with:
         pixi-version: v0.67.2
