@@ -29,9 +29,6 @@ runs:
       shell: bash
       env:
         ANA_VERSION: ${{ inputs.ana-version }}
-        ANA_NO_PATH_UPDATE: "1"
-        ANA_BOOTSTRAP: "false"
-        ANA_FORCE_INSTALL: "1"
       run: |  # zizmor: ignore[github-env]
         # Resolve "latest" to actual version tag
         if [[ "$ANA_VERSION" == "latest" ]]; then
@@ -42,7 +39,8 @@ runs:
         fi
 
         # Download and run the install script from GitHub Releases
-        curl -fsSL "https://github.com/anaconda/anaconda-cli/releases/download/${ANA_VERSION}/install.sh" | sh
+        curl -fsSL "https://github.com/anaconda/anaconda-cli/releases/download/${ANA_VERSION}/install.sh" \
+          | sh -s -- --version "$ANA_VERSION" --no-path-update --no-bootstrap --force
 
         # Add ana to PATH for subsequent steps (convert to Windows paths if needed)
         if [[ "$(uname -s)" == MINGW* ]] || [[ "$(uname -s)" == MSYS* ]] || [[ "$(uname -s)" == CYGWIN* ]]; then
