@@ -5,7 +5,7 @@ package:
   version: "0.0.${{ env.get('GITHUB_RUN_NUMBER') or '1' }}"
 
 build:
-  number: ${{ env.get('CONDA_BUILD_NUMBER', '0') }}
+  number: ${{ env.get('CONDA_BUILD_NUMBER') or '0' }}
   noarch: python
   script: echo "Test package installed"
 
