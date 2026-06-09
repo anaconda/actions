@@ -17,7 +17,7 @@ Install the latest version of ana:
 ```yaml
 - uses: anaconda/github-actions/setup-ana@0.2.0
   with:
-    ana-version: "1.0.0"
+    ana-version: "v0.1.6"
 ```
 
 ### Install ana with additional tools
@@ -58,9 +58,8 @@ jobs:
 
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
-| `ana-version` | Version of ana to install (e.g., `1.0.0` or `latest`) | No | `latest` |
+| `ana-version` | Version of ana to install (e.g., `v0.1.6` or `latest`) | No | `latest` |
 | `tools` | Space or comma-separated list of tools to install (e.g., `pixi` or `anaconda-cli, pixi`) | No | `''` |
-| `github-token` | GitHub token for accessing private repositories | No | `${{ github.token }}` |
 
 ## Outputs
 

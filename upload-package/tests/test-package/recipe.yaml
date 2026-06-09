@@ -1,7 +1,7 @@
 schema_version: 1
 
 package:
-  name: github-actions-test-package
+  name: github-actions-test-package${{ env.get('CONDA_PACKAGE_SUFFIX') or '' }}
   version: "0.0.${{ env.get('GITHUB_RUN_NUMBER') or '1' }}"
 
 build:

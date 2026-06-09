@@ -8,17 +8,13 @@ branding:
 
 inputs:
   ana-version:
-    description: Version of ana to install (e.g., "1.0.0" or "latest")
+    description: Version of ana to install (e.g., "v0.1.6" or "latest")
     required: false
     default: latest
   tools:
     description: Space or comma-separated list of tools to install (e.g., "pixi" or "anaconda-cli, pixi")
     required: false
     default: ""
-  github-token:
-    description: GitHub token for accessing private repositories
-    required: false
-    default: ${{ github.token }}
 
 outputs:
   ana-version:
@@ -33,18 +29,14 @@ runs:
       shell: bash
       env:
         ANA_VERSION: ${{ inputs.ana-version }}
-        ANA_NO_PATH_UPDATE: "1"
-        ANA_BOOTSTRAP: "false"
-        ANA_FORCE_INSTALL: "1"
-        GITHUB_TOKEN: ${{ inputs.github-token }}
-      run: |
-        # TODO(mattkram): This URL needs to be updated once it's available on a static URL
-        # Download and run the install script (use GitHub API for private repo support)
+        GITHUB_TOKEN: ${{ github.token }}
+      run: |  # zizmor: ignore[github-env]
+        # Download and run the install script from the public anaconda-cli repo
         curl -fsSL \
           -H "Authorization: token $GITHUB_TOKEN" \
           -H "Accept: application/vnd.github.v3.raw" \
-          "https://api.github.com/repos/anaconda/ana-cli/contents/scripts/install.sh?ref=main" \
-          | sh -s --
+          "https://api.github.com/repos/anaconda/anaconda-cli/contents/scripts/install.sh?ref=main" \
+          | sh -s -- --version "$ANA_VERSION" --no-path-update --no-bootstrap --force
 
         # Add ana to PATH for subsequent steps (convert to Windows paths if needed)
         if [[ "$(uname -s)" == MINGW* ]] || [[ "$(uname -s)" == MSYS* ]] || [[ "$(uname -s)" == CYGWIN* ]]; then
