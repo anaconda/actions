@@ -20,19 +20,17 @@ jobs:
           pixi-version: v0.67.2
           manifest-path: upload-package/tests/pixi.toml
 
-      - name: Build test conda package (build 0)
+      - name: Build test conda package
         working-directory: upload-package/tests
-        env:
-          CONDA_BUILD_NUMBER: "0"
         run: |
           pixi run rattler-build build \
             --recipe test-package/recipe.yaml \
             --output-dir ../build-0
 
-      - name: Build test conda package (build 1)
+      - name: Build test conda package (alternate name)
         working-directory: upload-package/tests
         env:
-          CONDA_BUILD_NUMBER: "1"
+          CONDA_PACKAGE_SUFFIX: "-alt"
         run: |
           pixi run rattler-build build \
             --recipe test-package/recipe.yaml \
