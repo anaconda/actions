@@ -23,7 +23,6 @@ jobs:
         uses: ./setup-ana
         with:
           tools: pixi
-          github-token: ${{ secrets.ANA_CLI_TOKEN }}
 
       - name: Verify ana is installed
         run: ana --version
