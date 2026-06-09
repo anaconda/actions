@@ -15,10 +15,6 @@ inputs:
     description: Space or comma-separated list of tools to install (e.g., "pixi" or "anaconda-cli, pixi")
     required: false
     default: ""
-  github-token:
-    description: GitHub token for API requests (increases rate limit)
-    required: false
-    default: ${{ github.token }}
 
 outputs:
   ana-version:
@@ -33,7 +29,7 @@ runs:
       shell: bash
       env:
         ANA_VERSION: ${{ inputs.ana-version }}
-        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GITHUB_TOKEN: ${{ github.token }}
       run: |  # zizmor: ignore[github-env]
         # Download and run the install script from the public anaconda-cli repo
         curl -fsSL \
