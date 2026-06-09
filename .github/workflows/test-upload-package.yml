@@ -27,7 +27,7 @@ jobs:
         run: |
           pixi run rattler-build build \
             --recipe test-package/recipe.yaml \
-            --output-dir ../build-0
+            --output-dir ../build
 
       - name: Build test conda package (alternate name)
         working-directory: upload-package/tests
@@ -36,20 +36,20 @@ jobs:
         run: |
           pixi run rattler-build build \
             --recipe test-package/recipe.yaml \
-            --output-dir ../build-1
+            --output-dir ../build-alt
 
       - name: Upload build artifact (build 0)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: test-conda-package-0
-          path: ./upload-package/build-0/noarch/*.conda
+          name: test-conda-package
+          path: ./upload-package/build/noarch/*.conda
           if-no-files-found: error
 
       - name: Upload build artifact (build 1)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: test-conda-package-1
-          path: ./upload-package/build-1/noarch/*.conda
+          name: test-conda-package-alt
+          path: ./upload-package/build-alt/noarch/*.conda
           if-no-files-found: error
 
   test-anaconda-org:
@@ -62,7 +62,7 @@ jobs:
       - name: Download test package
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: test-conda-package-0
+          name: test-conda-package
           path: ./packages
 
       - name: Upload to anaconda.org
@@ -85,7 +85,7 @@ jobs:
       - name: Download test package
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: test-conda-package-0
+          name: test-conda-package
           path: ./packages
 
       - name: Upload to repository
@@ -109,7 +109,7 @@ jobs:
       - name: Download test package
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: test-conda-package-0
+          name: test-conda-package
           path: ./packages
 
       - name: Upload to self-hosted
@@ -133,7 +133,7 @@ jobs:
       - name: Download test package
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: test-conda-package-1
+          name: test-conda-package-alt
           path: ./packages
 
       - name: First upload (anaconda.org)
