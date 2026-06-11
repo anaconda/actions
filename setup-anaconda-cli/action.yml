@@ -28,7 +28,7 @@ runs:
       id: run-installer
       shell: bash
       env:
-        INPUT_VERSION: ${{ inputs.version }}
+        VERSION_INPUT: ${{ inputs.version }}
         GITHUB_TOKEN: ${{ github.token }}
       run: | # zizmor: ignore[github-env]
         # Download and run the install script from the public anaconda-cli repo
@@ -36,7 +36,7 @@ runs:
           -H "Authorization: token $GITHUB_TOKEN" \
           -H "Accept: application/vnd.github.v3.raw" \
           "https://api.github.com/repos/anaconda/anaconda-cli/contents/scripts/install.sh?ref=main" \
-          | sh -s -- --version "$INPUT_VERSION" --no-path-update --no-bootstrap --force
+          | sh -s -- --version "$VERSION_INPUT" --no-path-update --no-bootstrap --force
 
         # Add ana to PATH for subsequent steps (convert to Windows paths if needed)
         if [[ "$(uname -s)" == MINGW* ]] || [[ "$(uname -s)" == MSYS* ]] || [[ "$(uname -s)" == CYGWIN* ]]; then
