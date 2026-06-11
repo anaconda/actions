@@ -1,5 +1,5 @@
 name: Setup ana
-description: Install the ana CLI and optional tools (anaconda-cli, pixi, etc.)
+description: Install the Anaconda CLI and optional tools
 author: Anaconda
 
 branding:
@@ -17,26 +17,26 @@ inputs:
     default: ""
 
 outputs:
-  ana-version:
+  version:
     description: The version of ana that was installed
-    value: ${{ steps.install-ana.outputs.version }}
+    value: ${{ steps.run-installer.outputs.version }}
 
 runs:
   using: composite
   steps:
-    - name: Install ana
-      id: install-ana
+    - name: Install Anaconda CLI
+      id: run-installer
       shell: bash
       env:
-        ANA_VERSION: ${{ inputs.version }}
+        INPUT_VERSION: ${{ inputs.version }}
         GITHUB_TOKEN: ${{ github.token }}
-      run: |  # zizmor: ignore[github-env]
+      run: | # zizmor: ignore[github-env]
         # Download and run the install script from the public anaconda-cli repo
         curl -fsSL \
           -H "Authorization: token $GITHUB_TOKEN" \
           -H "Accept: application/vnd.github.v3.raw" \
           "https://api.github.com/repos/anaconda/anaconda-cli/contents/scripts/install.sh?ref=main" \
-          | sh -s -- --version "$ANA_VERSION" --no-path-update --no-bootstrap --force
+          | sh -s -- --version "$INPUT_VERSION" --no-path-update --no-bootstrap --force
 
         # Add ana to PATH for subsequent steps (convert to Windows paths if needed)
         if [[ "$(uname -s)" == MINGW* ]] || [[ "$(uname -s)" == MSYS* ]] || [[ "$(uname -s)" == CYGWIN* ]]; then
@@ -56,7 +56,7 @@ runs:
         # Output the installed version
         VERSION=$("$ANA_BIN" --version | awk '{print $2}')
         echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-        echo "Installed ana version: $VERSION"
+        echo "Installed version: $VERSION"
 
     - name: Install tools
       if: inputs.tools != ''

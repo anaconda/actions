@@ -27,7 +27,7 @@ Install ana along with anaconda-cli, pixi:
 ```yaml
 - uses: anaconda/actions/setup-anaconda-cli@0.2.0
   with:
-    tools: anaconda-cli, pixi
+    tools: pixi
 ```
 
 ### Full example
