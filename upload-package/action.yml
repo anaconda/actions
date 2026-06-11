@@ -67,7 +67,6 @@ runs:
     - name: Install Anaconda CLI and pixi
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ github.token }}
         # renovate: datasource=github-releases depName=anaconda/anaconda-cli
         ANA_VERSION: v0.1.6
       run: | # zizmor: ignore[github-env]
@@ -78,10 +77,7 @@ runs:
         fi
 
         # Download and run the Anaconda CLI install script
-        curl -fsSL \
-          -H "Authorization: token $GITHUB_TOKEN" \
-          -H "Accept: application/vnd.github.v3.raw" \
-          "https://api.github.com/repos/anaconda/anaconda-cli/contents/scripts/install.sh?ref=main" \
+        curl -fsSL https://anaconda.sh/install.sh \
           | sh -s -- --version "$ANA_VERSION" --no-path-update --force
 
         # Add ana to PATH (convert to Windows paths if needed)
