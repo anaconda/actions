@@ -1,20 +1,18 @@
 # Anaconda GitHub Actions
 
-Reusable GitHub Actions for Anaconda customers.
+Reusable GitHub Actions for the Anaconda platform.
 
 ## Available Actions
 
-### [setup-ana](./setup-ana)
+### [setup-anaconda-cli](./setup-anaconda-cli)
 
-Install the ana CLI and optional tools (anaconda-cli, pixi, etc.) in GitHub Actions.
+Install the Anaconda CLI and optional tools in GitHub Actions.
 
 ```yaml
-- uses: anaconda/github-actions/setup-ana@0.2.0
-  with:
-    tools: anaconda-cli, pixi
+- uses: anaconda/github-actions/setup-anaconda-cli@0.2.0
 ```
 
-See the [setup-ana README](./setup-ana/README.md) for full documentation.
+See the [setup-anaconda-cli README](./setup-anaconda-cli/README.md) for full documentation.
 
 ### [upload-package](./upload-package)
 

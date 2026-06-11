@@ -1,0 +1,76 @@
+name: Setup Anaconda CLI
+description: Install the Anaconda CLI and optional tools
+author: Anaconda
+
+branding:
+  icon: package
+  color: green
+
+inputs:
+  version:
+    description: Version of Anaconda CLI to install (e.g., "v0.1.6" or "latest")
+    required: false
+    default: latest
+  tools:
+    description: Space or comma-separated list of tools to install (e.g., "pixi" or "anaconda-cli, pixi")
+    required: false
+    default: ""
+
+outputs:
+  version:
+    description: The version of Anaconda CLI that was installed
+    value: ${{ steps.run-installer.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install Anaconda CLI
+      id: run-installer
+      shell: bash
+      env:
+        INPUT_VERSION: ${{ inputs.version }}
+        GITHUB_TOKEN: ${{ github.token }}
+      run: | # zizmor: ignore[github-env]
+        # Download and run the install script from the public anaconda-cli repo
+        curl -fsSL \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          -H "Accept: application/vnd.github.v3.raw" \
+          "https://api.github.com/repos/anaconda/anaconda-cli/contents/scripts/install.sh?ref=main" \
+          | sh -s -- --version "$INPUT_VERSION" --no-path-update --no-bootstrap --force
+
+        # Add ana to PATH for subsequent steps (convert to Windows paths if needed)
+        if [[ "$(uname -s)" == MINGW* ]] || [[ "$(uname -s)" == MSYS* ]] || [[ "$(uname -s)" == CYGWIN* ]]; then
+          cygpath -w "$HOME/.local/bin" >> "$GITHUB_PATH"
+          cygpath -w "$HOME/.ana/bin" >> "$GITHUB_PATH"
+        else
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.ana/bin" >> "$GITHUB_PATH"
+        fi
+
+        # Determine binary name (with .exe on Windows)
+        ANA_BIN="$HOME/.local/bin/ana"
+        if [[ "$(uname -s)" == MINGW* ]] || [[ "$(uname -s)" == MSYS* ]] || [[ "$(uname -s)" == CYGWIN* ]]; then
+          ANA_BIN="$HOME/.local/bin/ana.exe"
+        fi
+
+        # Output the installed version
+        VERSION=$("$ANA_BIN" --version | awk '{print $2}')
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+        echo "Installed version: $VERSION"
+
+    - name: Install tools
+      if: inputs.tools != ''
+      shell: bash
+      env:
+        INPUT_TOOLS: ${{ inputs.tools }}
+      run: |
+        # Add ana to PATH for this step (GITHUB_PATH only applies after composite action completes)
+        export PATH="$HOME/.local/bin:$HOME/.ana/bin:$PATH"
+
+        # Parse tools input (supports space or comma-separated)
+        TOOLS=$(echo "$INPUT_TOOLS" | tr ',' ' ' | xargs)
+
+        for tool in $TOOLS; do
+          echo "Installing tool: $tool"
+          ana tool install "$tool"
+        done
