@@ -140,9 +140,9 @@ runs:
         fi
 
         # Show help for debugging purposes
-        ana org upload --help
+        anaconda org upload --help
 
-        ana org \
+        anaconda org \
           $GLOBAL_FLAGS \
           --token "$ANACONDA_API_TOKEN" \
           upload \
