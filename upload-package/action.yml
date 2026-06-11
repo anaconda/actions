@@ -68,6 +68,8 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ github.token }}
+        # renovate: datasource=github-releases depName=anaconda/anaconda-cli
+        ANA_VERSION: v0.1.6
       run: | # zizmor: ignore[github-env]
         # Skip if pixi is already installed
         if command -v pixi >/dev/null 2>&1; then
@@ -80,7 +82,7 @@ runs:
           -H "Authorization: token $GITHUB_TOKEN" \
           -H "Accept: application/vnd.github.v3.raw" \
           "https://api.github.com/repos/anaconda/anaconda-cli/contents/scripts/install.sh?ref=main" \
-          | sh -s -- --version latest --no-path-update --no-bootstrap --force
+          | sh -s -- --version "$ANA_VERSION" --no-path-update --no-bootstrap --force
 
         # Add ana to PATH (convert to Windows paths if needed)
         if [[ "$(uname -s)" == MINGW* ]] || [[ "$(uname -s)" == MSYS* ]] || [[ "$(uname -s)" == CYGWIN* ]]; then
