@@ -25,7 +25,7 @@ Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anacon
 - uses: anaconda/github-actions/upload-package@0.2.0
   with:
     token: ${{ secrets.ANACONDA_ORG_TOKEN }}
-    owner: my-org
+    channel: my-org
     packages: ./build/**/*.conda
 ```
 
@@ -34,7 +34,7 @@ Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anacon
 - uses: anaconda/github-actions/upload-package@0.2.0
   with:
     token: ${{ secrets.PSM_TOKEN }}
-    owner: my-channel
+    channel: my-channel
     packages: ./build/**/*.conda
     target-type: repository
     repository-url: https://pkgs.example.com/api/repo
@@ -45,7 +45,7 @@ Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anacon
 - uses: anaconda/github-actions/upload-package@0.2.0
   with:
     token: ${{ secrets.AP_API_KEY }}
-    owner: my-channel
+    channel: my-channel
     packages: ./build/**/*.conda
     target-type: self-hosted
     repository-url: https://anaconda.mycompany.com
