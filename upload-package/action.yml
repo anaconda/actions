@@ -9,9 +9,13 @@ inputs:
   packages:
     description: "Path or glob pattern to package files (e.g., ./build/noarch/*.conda or ./dist/*.whl)"
     required: true
+  channel:
+    description: "Channel to upload to (e.g., organization name or channel)"
+    required: false
   owner:
-    description: "Package owner/channel (e.g., organization name or channel)"
-    required: true
+    description: "Deprecated: Use 'channel' instead. Package owner/channel."
+    required: false
+    deprecationMessage: "The 'owner' input is deprecated. Please use 'channel' instead."
   target-type:
     description: 'Upload target type: "anaconda.org", "repository" (for PSM/Anaconda Business), or "self-hosted" (for self-hosted Anaconda Platform)'
     required: false
@@ -53,7 +57,18 @@ runs:
       env:
         INPUT_TARGET_TYPE: ${{ inputs.target-type }}
         INPUT_REPOSITORY_URL: ${{ inputs.repository-url }}
+        INPUT_CHANNEL: ${{ inputs.channel }}
+        INPUT_OWNER: ${{ inputs.owner }}
       run: |
+        if [ -z "$INPUT_CHANNEL" ] && [ -z "$INPUT_OWNER" ]; then
+          echo "::error::Either 'channel' or 'owner' input is required"
+          exit 1
+        fi
+
+        if [ -n "$INPUT_OWNER" ] && [ -z "$INPUT_CHANNEL" ]; then
+          echo "::warning::The 'owner' input is deprecated. Please use 'channel' instead."
+        fi
+
         if [ "$INPUT_TARGET_TYPE" = "repository" ] && [ -z "$INPUT_REPOSITORY_URL" ]; then
           echo "::error::repository-url is required when target-type is 'repository'"
           exit 1
@@ -97,9 +112,13 @@ runs:
         INPUT_SUMMARY: ${{ inputs.summary }}
         INPUT_PACKAGE_TYPE: ${{ inputs.package-type }}
         INPUT_LABELS: ${{ inputs.labels }}
+        INPUT_CHANNEL: ${{ inputs.channel }}
         INPUT_OWNER: ${{ inputs.owner }}
         INPUT_PACKAGES: ${{ inputs.packages }}
       run: |
+        # Use channel if provided, otherwise fall back to owner
+        CHANNEL="${INPUT_CHANNEL:-$INPUT_OWNER}"
+
         GLOBAL_FLAGS=""
         FLAGS=""
 
@@ -137,7 +156,7 @@ runs:
           $GLOBAL_FLAGS \
           --token "$ANACONDA_API_TOKEN" \
           upload \
-          --user "$INPUT_OWNER" \
+          --user "$CHANNEL" \
           $FLAGS \
           $INPUT_PACKAGES
 
@@ -150,9 +169,13 @@ runs:
         INPUT_REPOSITORY_URL: ${{ inputs.repository-url }}
         INPUT_VERBOSE: ${{ inputs.verbose }}
         INPUT_PACKAGE_TYPE: ${{ inputs.package-type }}
+        INPUT_CHANNEL: ${{ inputs.channel }}
         INPUT_OWNER: ${{ inputs.owner }}
         INPUT_PACKAGES: ${{ inputs.packages }}
       run: |
+        # Use channel if provided, otherwise fall back to owner
+        CHANNEL="${INPUT_CHANNEL:-$INPUT_OWNER}"
+
         pixi run conda repo config --set sites.upload_target.url "$INPUT_REPOSITORY_URL"
 
         GLOBAL_FLAGS=""
@@ -171,7 +194,7 @@ runs:
           --token "$UPLOAD_TOKEN" \
           --site upload_target \
           upload \
-          --channel "$INPUT_OWNER" \
+          --channel "$CHANNEL" \
           $FLAGS \
           $INPUT_PACKAGES
 
@@ -184,9 +207,13 @@ runs:
         INPUT_REPOSITORY_URL: ${{ inputs.repository-url }}
         INPUT_VERBOSE: ${{ inputs.verbose }}
         INPUT_PACKAGE_TYPE: ${{ inputs.package-type }}
+        INPUT_CHANNEL: ${{ inputs.channel }}
         INPUT_OWNER: ${{ inputs.owner }}
         INPUT_PACKAGES: ${{ inputs.packages }}
       run: |
+        # Use channel if provided, otherwise fall back to owner
+        CHANNEL="${INPUT_CHANNEL:-$INPUT_OWNER}"
+
         pixi run -e self-hosted anaconda sites add --default --domain "$INPUT_REPOSITORY_URL" --yes
 
         GLOBAL_FLAGS=""
@@ -203,6 +230,6 @@ runs:
         pixi run -e self-hosted anaconda \
           $GLOBAL_FLAGS \
           repo upload \
-          --channel "$INPUT_OWNER" \
+          --channel "$CHANNEL" \
           $FLAGS \
           $INPUT_PACKAGES

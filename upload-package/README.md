@@ -8,7 +8,10 @@ Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anacon
 |-------|-------------|----------|---------|
 | `token` | API token for authentication | Yes | - |
 | `packages` | Path or glob pattern to package files | Yes | - |
-| `owner` | Package owner/channel (org name or channel) | Yes | - |
+| `channel` | Channel to upload to (org name or channel) | Yes* | - |
+| `owner` | **Deprecated**: Use `channel` instead | Yes* | - |
+
+\* Either `channel` or `owner` must be provided. If both are provided, `channel` takes precedence.
 | `target-type` | `anaconda.org`, `repository`, or `self-hosted` | No | `anaconda.org` |
 | `repository-url` | Repository API URL for `repository` target, or domain for `self-hosted` target | No | - |
 | `package-type` | `conda` or `pypi` (auto-detected if not specified) | No | - |
@@ -28,7 +31,7 @@ Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anacon
   uses: anaconda/github-actions/upload-package@0.2.0
   with:
     token: ${{ secrets.ANACONDA_ORG_TOKEN }}
-    owner: my-org
+    channel: my-org
     packages: ./build/noarch/*.conda
 ```
 
@@ -39,7 +42,7 @@ Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anacon
   uses: anaconda/github-actions/upload-package@0.2.0
   with:
     token: ${{ secrets.ANACONDA_ORG_TOKEN }}
-    owner: my-org
+    channel: my-org
     packages: ./dist/*.whl
     summary: "My package description"
     private: true
@@ -53,7 +56,7 @@ Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anacon
   uses: anaconda/github-actions/upload-package@0.2.0
   with:
     token: ${{ secrets.PSM_TOKEN }}
-    owner: my-channel
+    channel: my-channel
     packages: ./build/noarch/*.conda
     target-type: repository
     repository-url: https://pkgs.example.com/api/repo
@@ -67,7 +70,7 @@ Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anacon
   uses: anaconda/github-actions/upload-package@0.2.0
   with:
     token: ${{ secrets.AP_API_KEY }}
-    owner: my-channel
+    channel: my-channel
     packages: ./build/noarch/*.conda
     target-type: self-hosted
     repository-url: https://anaconda.mycompany.com
@@ -123,7 +126,7 @@ jobs:
         uses: anaconda/github-actions/upload-package@0.2.0
         with:
           token: ${{ secrets.ANACONDA_ORG_TOKEN }}
-          owner: my-org
+          channel: my-org
           packages: ./dist/*.conda
           private: true
 
@@ -143,7 +146,7 @@ jobs:
         uses: anaconda/github-actions/upload-package@0.2.0
         with:
           token: ${{ secrets.PSM_TOKEN }}
-          owner: my-channel
+          channel: my-channel
           packages: ./dist/*.conda
           target-type: repository
           repository-url: https://pkgs.example.com/api/repo
@@ -170,7 +173,7 @@ jobs:
 - uses: anaconda/github-actions/upload-package@0.2.0
   with:
     token: ${{ secrets.TOKEN }}
-    owner: my-org
+    channel: my-org
     packages: ./build/*.conda
     private: true
 ```
@@ -195,7 +198,7 @@ jobs:
 - uses: anaconda/github-actions/upload-package@0.2.0
   with:
     token: ${{ secrets.TOKEN }}
-    owner: my-channel
+    channel: my-channel
     packages: ./build/*.conda
     target-type: repository
     repository-url: https://pkgs.example.com/api/repo
