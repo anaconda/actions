@@ -76,7 +76,10 @@ jobs:
           verbose: true
 
       - name: Verify package was uploaded
+        env:
+          ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_ORG_TEST_TOKEN }}
         run: |
+          conda config --set add_anaconda_token true
           conda search -c anaconda-cloud github-actions-test-package=0.0.${{ github.run_number }}
 
   test-repository:
