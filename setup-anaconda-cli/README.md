@@ -6,7 +6,7 @@ Install the [Anaconda CLI](https://github.com/anaconda/anaconda-cli) and optiona
 
 ### Basic usage
 
-Install the latest version of ana:
+Install the latest version of Anaconda CLI:
 
 ```yaml
 - uses: anaconda/actions/setup-anaconda-cli@0.2.0
@@ -17,7 +17,7 @@ Install the latest version of ana:
 ```yaml
 - uses: anaconda/actions/setup-anaconda-cli@0.2.0
   with:
-    ana-version: "v0.1.6"
+    version: "v0.1.6"
 ```
 
 ### Install ana with additional tools
@@ -45,12 +45,12 @@ jobs:
       - uses: anaconda/actions/setup-anaconda-cli@0.2.0
         id: setup-anaconda-cli
         with:
-          ana-version: latest
+          version: latest
           tools: pixi
 
       - name: Show installed version
         run: |
-          echo "Installed ana version: ${{ steps.setup-anaconda-cli.outputs.ana-version }}"
+          echo "Installed ana version: ${{ steps.setup-anaconda-cli.outputs.version }}"
           ana --version
 ```
 
@@ -58,14 +58,14 @@ jobs:
 
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
-| `ana-version` | Version of ana to install (e.g., `v0.1.6` or `latest`) | No | `latest` |
+| `version` | Version of ana to install (e.g., `v0.1.6` or `latest`) | No | `latest` |
 | `tools` | Space or comma-separated list of tools to install (e.g., `pixi` or `anaconda-cli, pixi`) | No | `''` |
 
 ## Outputs
 
 | Output | Description |
 |--------|-------------|
-| `ana-version` | The version of ana that was installed |
+| `version` | The version of ana that was installed |
 
 ## Platform support
 

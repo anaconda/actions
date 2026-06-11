@@ -7,7 +7,7 @@ branding:
   color: green
 
 inputs:
-  ana-version:
+  version:
     description: Version of ana to install (e.g., "v0.1.6" or "latest")
     required: false
     default: latest
@@ -28,7 +28,7 @@ runs:
       id: install-ana
       shell: bash
       env:
-        ANA_VERSION: ${{ inputs.ana-version }}
+        ANA_VERSION: ${{ inputs.version }}
         GITHUB_TOKEN: ${{ github.token }}
       run: |  # zizmor: ignore[github-env]
         # Download and run the install script from the public anaconda-cli repo
