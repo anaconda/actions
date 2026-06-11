@@ -1,4 +1,4 @@
-name: Test setup-ana action
+name: Test setup-anaconda-cli action
 
 on:
   pull_request:
@@ -19,8 +19,8 @@ jobs:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
       - name: Setup ana with pixi
-        id: setup-ana
-        uses: ./setup-ana
+        id: setup-anaconda-cli
+        uses: ./setup-anaconda-cli
         with:
           tools: pixi
 

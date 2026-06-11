@@ -44,7 +44,7 @@ jobs:
           scopes: |
             foobar # First scope is not working, dummy value
             deps
-            setup-ana
+            setup-anaconda-cli
             upload-package
           requireScope: false
           # Ensure subject is not empty And starts with an uppercase letter
