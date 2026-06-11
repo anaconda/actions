@@ -142,7 +142,7 @@ runs:
         # Show help for debugging purposes
         anaconda org upload --help
 
-        anaconda org \
+        anaconda \
           $GLOBAL_FLAGS \
           --token "$ANACONDA_API_TOKEN" \
           upload \
