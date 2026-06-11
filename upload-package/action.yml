@@ -64,25 +64,37 @@ runs:
           exit 1
         fi
 
-    # setup-pixi fails if ~/.pixi/bin/pixi already exists, which happens when
-    # this action is used more than once in the same job. Skip setup if pixi
-    # is already on PATH — pixi run will resolve the env from PIXI_PROJECT_MANIFEST.
-    - name: Check for existing pixi
-      id: pixi-check
+    - name: Install Anaconda CLI and pixi
       shell: bash
-      run: |
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: | # zizmor: ignore[github-env]
+        # Skip if pixi is already installed
         if command -v pixi >/dev/null 2>&1; then
-          echo "installed=true" >> "$GITHUB_OUTPUT"
-        else
-          echo "installed=false" >> "$GITHUB_OUTPUT"
+          echo "pixi is already installed"
+          exit 0
         fi
 
-    - name: Setup pixi
-      if: steps.pixi-check.outputs.installed != 'true'
-      uses: prefix-dev/setup-pixi@1b2de7f3351f171c8b4dfeb558c639cb58ed4ec0 # v0.9.5
-      with:
-        pixi-version: v0.67.2
-        manifest-path: ${{ github.action_path }}/pixi.toml
+        # Download and run the Anaconda CLI install script
+        curl -fsSL \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          -H "Accept: application/vnd.github.v3.raw" \
+          "https://api.github.com/repos/anaconda/anaconda-cli/contents/scripts/install.sh?ref=main" \
+          | sh -s -- --version latest --no-path-update --no-bootstrap --force
+
+        # Add ana to PATH (convert to Windows paths if needed)
+        if [[ "$(uname -s)" == MINGW* ]] || [[ "$(uname -s)" == MSYS* ]] || [[ "$(uname -s)" == CYGWIN* ]]; then
+          cygpath -w "$HOME/.local/bin" >> "$GITHUB_PATH"
+          cygpath -w "$HOME/.ana/bin" >> "$GITHUB_PATH"
+        else
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.ana/bin" >> "$GITHUB_PATH"
+        fi
+
+        # Install tools via ana
+        export PATH="$HOME/.local/bin:$HOME/.ana/bin:$PATH"
+        ana tool install anaconda-cli
+        ana tool install pixi
 
     - name: Upload to anaconda.org
       if: inputs.target-type == 'anaconda.org'
