@@ -75,6 +75,10 @@ jobs:
           labels: "main,dev"
           verbose: true
 
+      - name: Verify package was uploaded
+        run: |
+          conda search -c anaconda-cloud github-actions-test-package=0.0.${{ github.run_number }}
+
   test-repository:
     name: Test repository upload
     needs: build-test-package
