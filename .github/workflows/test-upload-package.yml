@@ -80,9 +80,7 @@ jobs:
           ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_ORG_TEST_TOKEN }}
           ANACONDA_CLIENT_FORCE_STANDALONE: "1"
         run: |
-          # Store token on disk for conda to use (stop-gap until upstream fix)
-          mkdir -p ~/.continuum/anaconda-client/tokens
-          echo "$ANACONDA_API_TOKEN" > ~/.continuum/anaconda-client/tokens/https%3A%2F%2Fapi.anaconda.org.token
+          anaconda -t "$ANACONDA_API_TOKEN" login
           conda config --set add_anaconda_token true
           conda search -c anaconda-cloud github-actions-test-package=0.0.${{ github.run_number }}
 
