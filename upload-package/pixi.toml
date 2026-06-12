@@ -14,13 +14,5 @@ setuptools = "<72"
 [feature.repository.dependencies]
 conda-repo-cli = "=1.0.173"
 
-# Feature for self-hosted Anaconda Platform uploads
-[feature.self-hosted]
-channels = ["anaconda-cloud/label/dev", "https://repo.anaconda.com/pkgs/main"]
-
-[feature.self-hosted.dependencies]
-anaconda-repo-cli = "*"
-
 [environments]
 default = ["default", "repository"]
-self-hosted = ["default", "self-hosted"]

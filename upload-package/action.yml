@@ -1,5 +1,5 @@
 name: "Upload Package"
-description: "Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM), or self-hosted Anaconda Platform"
+description: "Upload conda or Python packages to Anaconda.org or Package Security Manager (PSM)"
 author: "Anaconda"
 
 inputs:
@@ -10,18 +10,18 @@ inputs:
     description: "Path or glob pattern to package files (e.g., ./build/noarch/*.conda or ./dist/*.whl)"
     required: true
   channel:
-    description: "Channel to upload to (e.g., organization name or channel)"
+    description: "Channel to upload to (e.g., username or organization name)"
     required: false
   owner:
     description: "Deprecated: Use 'channel' instead. Package owner/channel."
     required: false
     deprecationMessage: "The 'owner' input is deprecated. Please use 'channel' instead."
   target-type:
-    description: 'Upload target type: "anaconda.org", "repository" (for PSM/Anaconda Business), or "self-hosted" (for self-hosted Anaconda Platform)'
+    description: 'Upload target type: "anaconda.org" or "psm"'
     required: false
     default: "anaconda.org"
   repository-url:
-    description: 'URL of the repository API (required when target-type is "repository" or "self-hosted")'
+    description: 'URL of the repository API (required when target-type is "psm")'
     required: false
   package-type:
     description: 'Type of package: "conda" or "pypi" (auto-detected from file extension if not specified)'
@@ -69,15 +69,18 @@ runs:
           echo "::warning::The 'owner' input is deprecated. Please use 'channel' instead."
         fi
 
-        if [ "$INPUT_TARGET_TYPE" = "repository" ] && [ -z "$INPUT_REPOSITORY_URL" ]; then
-          echo "::error::repository-url is required when target-type is 'repository'"
-          exit 1
+        # 'repository' is a deprecated alias for 'psm'
+        if [ "$INPUT_TARGET_TYPE" = "repository" ]; then
+          echo "::warning::The 'repository' target-type is deprecated. Please use 'psm' instead."
         fi
 
-        if [ "$INPUT_TARGET_TYPE" = "self-hosted" ] && [ -z "$INPUT_REPOSITORY_URL" ]; then
-          echo "::error::repository-url is required when target-type is 'self-hosted'"
-          exit 1
+        if [ "$INPUT_TARGET_TYPE" = "psm" ] || [ "$INPUT_TARGET_TYPE" = "repository" ]; then
+          if [ -z "$INPUT_REPOSITORY_URL" ]; then
+            echo "::error::repository-url is required when target-type is 'psm'"
+            exit 1
+          fi
         fi
+
 
     - name: Install Anaconda CLI and pixi
       shell: bash
@@ -169,8 +172,8 @@ runs:
           $FLAGS \
           $INPUT_PACKAGES
 
-    - name: Upload to repository
-      if: inputs.target-type == 'repository'
+    - name: Upload to Package Security Manager
+      if: inputs.target-type == 'psm' || inputs.target-type == 'repository'
       shell: bash
       env:
         UPLOAD_TOKEN: ${{ inputs.token }}
@@ -207,38 +210,3 @@ runs:
           $FLAGS \
           $INPUT_PACKAGES
 
-    - name: Upload to self-hosted
-      if: inputs.target-type == 'self-hosted'
-      shell: bash
-      env:
-        ANACONDA_AUTH_API_KEY: ${{ inputs.token }}
-        PIXI_PROJECT_MANIFEST: ${{ github.action_path }}/pixi.toml
-        INPUT_REPOSITORY_URL: ${{ inputs.repository-url }}
-        INPUT_VERBOSE: ${{ inputs.verbose }}
-        INPUT_PACKAGE_TYPE: ${{ inputs.package-type }}
-        INPUT_CHANNEL: ${{ inputs.channel }}
-        INPUT_OWNER: ${{ inputs.owner }}
-        INPUT_PACKAGES: ${{ inputs.packages }}
-      run: |
-        # Use channel if provided, otherwise fall back to owner
-        CHANNEL="${INPUT_CHANNEL:-$INPUT_OWNER}"
-
-        pixi run -e self-hosted anaconda sites add --default --domain "$INPUT_REPOSITORY_URL" --yes
-
-        GLOBAL_FLAGS=""
-        FLAGS=""
-
-        if [ "$INPUT_VERBOSE" = "true" ]; then
-          GLOBAL_FLAGS="$GLOBAL_FLAGS --verbose"
-        fi
-
-        if [ -n "$INPUT_PACKAGE_TYPE" ]; then
-          FLAGS="$FLAGS --package-type $INPUT_PACKAGE_TYPE"
-        fi
-
-        pixi run -e self-hosted anaconda \
-          $GLOBAL_FLAGS \
-          repo upload \
-          --channel "$CHANNEL" \
-          $FLAGS \
-          $INPUT_PACKAGES

@@ -16,7 +16,7 @@ See the [setup-anaconda-cli README](./setup-anaconda-cli/README.md) for full doc
 
 ### [upload-package](./upload-package)
 
-Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anaconda Business), or self-hosted Anaconda Platform.
+Upload conda or Python packages to Anaconda.org or Package Security Manager (PSM).
 
 **Upload to anaconda.org:**
 ```yaml
@@ -27,26 +27,15 @@ Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anacon
     packages: ./build/**/*.conda
 ```
 
-**Upload to Anaconda Repository (PSM):**
+**Upload to Package Security Manager (PSM):**
 ```yaml
 - uses: anaconda/actions/upload-package@0.2.0
   with:
     token: ${{ secrets.PSM_TOKEN }}
     channel: my-channel
     packages: ./build/**/*.conda
-    target-type: repository
+    target-type: psm
     repository-url: https://pkgs.example.com/api/repo
-```
-
-**Upload to self-hosted Anaconda Platform:**
-```yaml
-- uses: anaconda/actions/upload-package@0.2.0
-  with:
-    token: ${{ secrets.AP_API_KEY }}
-    channel: my-channel
-    packages: ./build/**/*.conda
-    target-type: self-hosted
-    repository-url: https://anaconda.mycompany.com
 ```
 
 See the [upload-package README](./upload-package/README.md) for full documentation.
