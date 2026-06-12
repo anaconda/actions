@@ -69,11 +69,25 @@ jobs:
         uses: ./upload-package
         with:
           token: ${{ secrets.ANACONDA_ORG_TEST_TOKEN }}
-          owner: anaconda-cloud
+          channel: anaconda-cloud
           packages: ./packages/*.conda
           private: true
           labels: "main,dev"
           verbose: true
+
+      - name: Verify package was uploaded
+        env:
+          ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_ORG_TEST_TOKEN }}
+          ANACONDA_CLIENT_FORCE_STANDALONE: "1"
+        run: |
+          # Store token using anaconda-client's storage mechanism
+          ~/.ana/tools/anaconda-cli/bin/python -c "
+          import os
+          from binstar_client.utils.config import store_token
+          store_token(os.environ['ANACONDA_API_TOKEN'], None)
+          "
+          conda config --set add_anaconda_token true
+          conda search -c anaconda-cloud github-actions-test-package=0.0.${{ github.run_number }}
 
   test-repository:
     name: Test repository upload
@@ -92,7 +106,7 @@ jobs:
         uses: ./upload-package
         with:
           token: ${{ secrets.PSM_PKGS_INTERNAL_TEST_TOKEN }}
-          owner: anaconda-github-actions-test
+          channel: anaconda-github-actions-test
           packages: ./packages/*.conda
           target-type: repository
           repository-url: ${{ vars.PSM_PKGS_INTERNAL_TEST_URL }}
@@ -116,7 +130,7 @@ jobs:
         uses: ./upload-package
         with:
           token: ${{ secrets.AP_STAGING_API_KEY }}
-          owner: anaconda-github-actions-test
+          channel: anaconda-github-actions-test
           packages: ./packages/*.conda
           target-type: self-hosted
           repository-url: ${{ vars.AP_STAGING_URL }}
@@ -140,7 +154,7 @@ jobs:
         uses: ./upload-package
         with:
           token: ${{ secrets.ANACONDA_ORG_TEST_TOKEN }}
-          owner: anaconda-cloud
+          channel: anaconda-cloud
           packages: ./packages/*.conda
           private: true
           labels: "main,dev"
@@ -151,7 +165,7 @@ jobs:
         uses: ./upload-package
         with:
           token: ${{ secrets.PSM_PKGS_INTERNAL_TEST_TOKEN }}
-          owner: anaconda-github-actions-test
+          channel: anaconda-github-actions-test
           packages: ./packages/*.conda
           target-type: repository
           repository-url: ${{ vars.PSM_PKGS_INTERNAL_TEST_URL }}
