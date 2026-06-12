@@ -69,7 +69,7 @@ jobs:
         uses: ./upload-package
         with:
           token: ${{ secrets.ANACONDA_ORG_TEST_TOKEN }}
-          owner: anaconda-cloud
+          channel: anaconda-cloud
           packages: ./packages/*.conda
           private: true
           labels: "main,dev"
@@ -106,7 +106,7 @@ jobs:
         uses: ./upload-package
         with:
           token: ${{ secrets.PSM_PKGS_INTERNAL_TEST_TOKEN }}
-          owner: anaconda-github-actions-test
+          channel: anaconda-github-actions-test
           packages: ./packages/*.conda
           target-type: repository
           repository-url: ${{ vars.PSM_PKGS_INTERNAL_TEST_URL }}
@@ -130,7 +130,7 @@ jobs:
         uses: ./upload-package
         with:
           token: ${{ secrets.AP_STAGING_API_KEY }}
-          owner: anaconda-github-actions-test
+          channel: anaconda-github-actions-test
           packages: ./packages/*.conda
           target-type: self-hosted
           repository-url: ${{ vars.AP_STAGING_URL }}
@@ -154,7 +154,7 @@ jobs:
         uses: ./upload-package
         with:
           token: ${{ secrets.ANACONDA_ORG_TEST_TOKEN }}
-          owner: anaconda-cloud
+          channel: anaconda-cloud
           packages: ./packages/*.conda
           private: true
           labels: "main,dev"
@@ -165,7 +165,7 @@ jobs:
         uses: ./upload-package
         with:
           token: ${{ secrets.PSM_PKGS_INTERNAL_TEST_TOKEN }}
-          owner: anaconda-github-actions-test
+          channel: anaconda-github-actions-test
           packages: ./packages/*.conda
           target-type: repository
           repository-url: ${{ vars.PSM_PKGS_INTERNAL_TEST_URL }}
