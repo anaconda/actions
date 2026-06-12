@@ -9,13 +9,13 @@ Install the [ana CLI](https://github.com/anaconda/ana-cli) and optional tools (a
 Install the latest version of ana:
 
 ```yaml
-- uses: anaconda/github-actions/setup-ana@0.2.0
+- uses: anaconda/actions/setup-ana@0.2.0
 ```
 
 ### Install a specific version
 
 ```yaml
-- uses: anaconda/github-actions/setup-ana@0.2.0
+- uses: anaconda/actions/setup-ana@0.2.0
   with:
     ana-version: "v0.1.6"
 ```
@@ -25,7 +25,7 @@ Install the latest version of ana:
 Install ana along with anaconda-cli, pixi:
 
 ```yaml
-- uses: anaconda/github-actions/setup-ana@0.2.0
+- uses: anaconda/actions/setup-ana@0.2.0
   with:
     tools: anaconda-cli, pixi
 ```
@@ -42,7 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: anaconda/github-actions/setup-ana@0.2.0
+      - uses: anaconda/actions/setup-ana@0.2.0
         id: setup-ana
         with:
           ana-version: latest
