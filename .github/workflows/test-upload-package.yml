@@ -80,7 +80,12 @@ jobs:
           ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_ORG_TEST_TOKEN }}
           ANACONDA_CLIENT_FORCE_STANDALONE: "1"
         run: |
-          echo Y | anaconda -t "$ANACONDA_API_TOKEN" login
+          # Store token using anaconda-client's storage mechanism
+          python -c "
+          import os
+          from binstar_client.utils.config import store_token
+          store_token(os.environ['ANACONDA_API_TOKEN'], None)
+          "
           conda config --set add_anaconda_token true
           conda search -c anaconda-cloud github-actions-test-package=0.0.${{ github.run_number }}
 
