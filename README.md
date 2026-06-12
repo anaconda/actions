@@ -9,7 +9,7 @@ Reusable GitHub Actions for the Anaconda platform.
 Install the Anaconda CLI and optional tools in GitHub Actions.
 
 ```yaml
-- uses: anaconda/github-actions/setup-anaconda-cli@0.2.0
+- uses: anaconda/actions/setup-anaconda-cli@0.2.0
 ```
 
 See the [setup-anaconda-cli README](./setup-anaconda-cli/README.md) for full documentation.
@@ -20,7 +20,7 @@ Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anacon
 
 **Upload to anaconda.org:**
 ```yaml
-- uses: anaconda/github-actions/upload-package@0.2.0
+- uses: anaconda/actions/upload-package@0.2.0
   with:
     token: ${{ secrets.ANACONDA_ORG_TOKEN }}
     channel: my-org
@@ -29,7 +29,7 @@ Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anacon
 
 **Upload to Anaconda Repository (PSM):**
 ```yaml
-- uses: anaconda/github-actions/upload-package@0.2.0
+- uses: anaconda/actions/upload-package@0.2.0
   with:
     token: ${{ secrets.PSM_TOKEN }}
     channel: my-channel
@@ -40,7 +40,7 @@ Upload conda or Python packages to Anaconda.org, Anaconda Repository (PSM/Anacon
 
 **Upload to self-hosted Anaconda Platform:**
 ```yaml
-- uses: anaconda/github-actions/upload-package@0.2.0
+- uses: anaconda/actions/upload-package@0.2.0
   with:
     token: ${{ secrets.AP_API_KEY }}
     channel: my-channel

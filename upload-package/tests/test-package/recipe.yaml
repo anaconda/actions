@@ -20,6 +20,6 @@ tests:
       - echo "Test passed"
 
 about:
-  homepage: https://github.com/anaconda/github-actions
+  homepage: https://github.com/anaconda/actions
   license: BSD-3-Clause
   summary: Test package for validating the upload-package GitHub Action
