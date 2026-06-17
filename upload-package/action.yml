@@ -86,7 +86,7 @@ runs:
       shell: bash
       env:
         # renovate: datasource=github-releases depName=anaconda/anaconda-cli
-        ANA_VERSION: v0.1.6
+        ANA_VERSION: v0.2.1
       run: | # zizmor: ignore[github-env]
         # Skip if ana is already installed
         if command -v ana >/dev/null 2>&1; then
@@ -162,9 +162,11 @@ runs:
         fi
 
         # Show help for debugging purposes
-        anaconda org upload --help
+        # Note: anaconda symlink was removed in anaconda-cli v0.2.0, use full path
+        ANACONDA_BIN="$HOME/.ana/tools/anaconda-cli/bin/anaconda"
+        "$ANACONDA_BIN" org upload --help
 
-        anaconda \
+        "$ANACONDA_BIN" \
           $GLOBAL_FLAGS \
           --token "$ANACONDA_API_TOKEN" \
           upload \
