@@ -45,7 +45,6 @@ Upload conda or Python packages to Anaconda.org or Package Security Manager (PSM
     channel: my-org
     packages: ./dist/*.whl
     summary: "My package description"
-    private: true
     labels: "main,dev"
 ```
 
@@ -87,8 +86,8 @@ jobs:
       - name: Build conda package
         shell: bash -el {0}
         run: |
-          conda install -y conda-build
-          conda build recipe --output-folder ./build
+          conda install -y -n base conda-build
+          conda run -n base conda build recipe --output-folder ./build
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -114,7 +113,6 @@ jobs:
           token: ${{ secrets.ANACONDA_ORG_TOKEN }}
           channel: my-org
           packages: ./dist/*.conda
-          private: true
 
   publish-psm:
     needs: build
