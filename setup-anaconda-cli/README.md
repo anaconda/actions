@@ -9,13 +9,13 @@ Install the [Anaconda CLI](https://github.com/anaconda/anaconda-cli) and optiona
 Install the latest version of Anaconda CLI:
 
 ```yaml
-- uses: anaconda/actions/setup-anaconda-cli@0.2.0
+- uses: anaconda/actions/setup-anaconda-cli@v0
 ```
 
 ### Install a specific version
 
 ```yaml
-- uses: anaconda/actions/setup-anaconda-cli@0.2.0
+- uses: anaconda/actions/setup-anaconda-cli@v0
   with:
     version: "v0.1.6"
 ```
@@ -25,7 +25,7 @@ Install the latest version of Anaconda CLI:
 Install Anaconda CLI along with pixi:
 
 ```yaml
-- uses: anaconda/actions/setup-anaconda-cli@0.2.0
+- uses: anaconda/actions/setup-anaconda-cli@v0
   with:
     tools: pixi
 ```
@@ -42,7 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: anaconda/actions/setup-anaconda-cli@0.2.0
+      - uses: anaconda/actions/setup-anaconda-cli@v0
         id: setup-anaconda-cli
         with:
           version: latest

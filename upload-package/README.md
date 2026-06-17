@@ -28,7 +28,7 @@ Upload conda or Python packages to Anaconda.org or Package Security Manager (PSM
 
 ```yaml
 - name: Upload to anaconda.org
-  uses: anaconda/actions/upload-package@0.2.0
+  uses: anaconda/actions/upload-package@v0
   with:
     token: ${{ secrets.ANACONDA_ORG_TOKEN }}
     channel: my-org
@@ -39,7 +39,7 @@ Upload conda or Python packages to Anaconda.org or Package Security Manager (PSM
 
 ```yaml
 - name: Upload wheel to anaconda.org
-  uses: anaconda/actions/upload-package@0.2.0
+  uses: anaconda/actions/upload-package@v0
   with:
     token: ${{ secrets.ANACONDA_ORG_TOKEN }}
     channel: my-org
@@ -53,7 +53,7 @@ Upload conda or Python packages to Anaconda.org or Package Security Manager (PSM
 
 ```yaml
 - name: Upload to PSM
-  uses: anaconda/actions/upload-package@0.2.0
+  uses: anaconda/actions/upload-package@v0
   with:
     token: ${{ secrets.PSM_TOKEN }}
     channel: my-channel
@@ -109,7 +109,7 @@ jobs:
           path: ./dist
 
       - name: Upload to anaconda.org
-        uses: anaconda/actions/upload-package@0.2.0
+        uses: anaconda/actions/upload-package@v0
         with:
           token: ${{ secrets.ANACONDA_ORG_TOKEN }}
           channel: my-org
@@ -129,7 +129,7 @@ jobs:
           path: ./dist
 
       - name: Upload to PSM
-        uses: anaconda/actions/upload-package@0.2.0
+        uses: anaconda/actions/upload-package@v0
         with:
           token: ${{ secrets.PSM_TOKEN }}
           channel: my-channel
@@ -156,7 +156,7 @@ jobs:
 ### After
 
 ```yaml
-- uses: anaconda/actions/upload-package@0.2.0
+- uses: anaconda/actions/upload-package@v0
   with:
     token: ${{ secrets.TOKEN }}
     channel: my-org
@@ -181,7 +181,7 @@ jobs:
 ### After
 
 ```yaml
-- uses: anaconda/actions/upload-package@0.2.0
+- uses: anaconda/actions/upload-package@v0
   with:
     token: ${{ secrets.TOKEN }}
     channel: my-channel
