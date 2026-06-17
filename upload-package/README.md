@@ -28,7 +28,7 @@ Upload conda or Python packages to Anaconda.org or Package Security Manager (PSM
 
 ```yaml
 - name: Upload to anaconda.org
-  uses: anaconda/actions/upload-package@0.2.0
+  uses: anaconda/actions/upload-package@v0
   with:
     token: ${{ secrets.ANACONDA_ORG_TOKEN }}
     channel: my-org
@@ -39,13 +39,12 @@ Upload conda or Python packages to Anaconda.org or Package Security Manager (PSM
 
 ```yaml
 - name: Upload wheel to anaconda.org
-  uses: anaconda/actions/upload-package@0.2.0
+  uses: anaconda/actions/upload-package@v0
   with:
     token: ${{ secrets.ANACONDA_ORG_TOKEN }}
     channel: my-org
     packages: ./dist/*.whl
     summary: "My package description"
-    private: true
     labels: "main,dev"
 ```
 
@@ -53,7 +52,7 @@ Upload conda or Python packages to Anaconda.org or Package Security Manager (PSM
 
 ```yaml
 - name: Upload to PSM
-  uses: anaconda/actions/upload-package@0.2.0
+  uses: anaconda/actions/upload-package@v0
   with:
     token: ${{ secrets.PSM_TOKEN }}
     channel: my-channel
@@ -87,8 +86,8 @@ jobs:
       - name: Build conda package
         shell: bash -el {0}
         run: |
-          conda install -y conda-build
-          conda build recipe --output-folder ./build
+          conda install -y -n base conda-build
+          conda run -n base conda build recipe --output-folder ./build
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -109,12 +108,11 @@ jobs:
           path: ./dist
 
       - name: Upload to anaconda.org
-        uses: anaconda/actions/upload-package@0.2.0
+        uses: anaconda/actions/upload-package@v0
         with:
           token: ${{ secrets.ANACONDA_ORG_TOKEN }}
           channel: my-org
           packages: ./dist/*.conda
-          private: true
 
   publish-psm:
     needs: build
@@ -129,7 +127,7 @@ jobs:
           path: ./dist
 
       - name: Upload to PSM
-        uses: anaconda/actions/upload-package@0.2.0
+        uses: anaconda/actions/upload-package@v0
         with:
           token: ${{ secrets.PSM_TOKEN }}
           channel: my-channel
@@ -156,7 +154,7 @@ jobs:
 ### After
 
 ```yaml
-- uses: anaconda/actions/upload-package@0.2.0
+- uses: anaconda/actions/upload-package@v0
   with:
     token: ${{ secrets.TOKEN }}
     channel: my-org
@@ -181,7 +179,7 @@ jobs:
 ### After
 
 ```yaml
-- uses: anaconda/actions/upload-package@0.2.0
+- uses: anaconda/actions/upload-package@v0
   with:
     token: ${{ secrets.TOKEN }}
     channel: my-channel
