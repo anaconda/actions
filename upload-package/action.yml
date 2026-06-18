@@ -81,7 +81,6 @@ runs:
           fi
         fi
 
-
     - name: Install Anaconda CLI and pixi
       shell: bash
       env:
@@ -164,7 +163,6 @@ runs:
         # Show help for debugging purposes
         # Note: anaconda symlink was removed in anaconda-cli v0.2.0, use full path
         ANACONDA_BIN="$HOME/.ana/tools/anaconda-cli/bin/anaconda"
-        "$ANACONDA_BIN" org upload --help
 
         "$ANACONDA_BIN" \
           $GLOBAL_FLAGS \
@@ -211,4 +209,3 @@ runs:
           --channel "$CHANNEL" \
           $FLAGS \
           $INPUT_PACKAGES
-
