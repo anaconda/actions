@@ -1,0 +1,8 @@
+# CBC override for testing — alternate numpy pin.
+# Used by test_no_cbc_does_not_have_override_pin to verify that the
+# 1.26.* result in test_local_cbc_override_reaches_compiled_package is
+# not a coincidence: a different CBC gives a different pin.
+numpy:
+  - 2.0.*
+python:
+  - 3.12.*

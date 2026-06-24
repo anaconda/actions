@@ -1,0 +1,410 @@
+name: Test build-conda action
+
+on:
+  pull_request:
+    paths:
+      - "build-conda/**"
+      - "upload-package/**"
+      - ".github/workflows/test-build-conda.yml"
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  # ──────────────────────────────────────────────────────────
+  # INT-1 / INT-9: Zero-config build; recipe at conda.recipe/
+  # ──────────────────────────────────────────────────────────
+  test-zero-config:
+    name: "INT-1/9: zero-config build (auto-discovery)"
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up recipe for auto-discovery
+        run: cp -r build-conda/tests/test-package conda.recipe
+
+      - name: Build (no inputs — should discover conda.recipe/)
+        uses: ./build-conda
+
+      - name: Verify .conda file exists
+        run: |
+          COUNT=$(find ./build -name "*.conda" -o -name "*.tar.bz2" | wc -l)
+          if [ "$COUNT" -eq 0 ]; then
+            echo "::error::No package files found in ./build"
+            exit 1
+          fi
+          echo "Found $COUNT package file(s):"
+          find ./build -name "*.conda" -o -name "*.tar.bz2"
+
+  # ──────────────────────────────────────────────────────────
+  # INT-2: conda-forge preset
+  # ──────────────────────────────────────────────────────────
+  test-conda-forge-preset:
+    name: "INT-2: conda-forge preset"
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Build with conda-forge preset
+        uses: ./build-conda
+        with:
+          recipe: build-conda/tests/test-package
+          cbc-preset: conda-forge
+          channels: conda-forge
+
+      - name: Verify .conda file exists
+        run: |
+          COUNT=$(find ./build -name "*.conda" -o -name "*.tar.bz2" | wc -l)
+          if [ "$COUNT" -eq 0 ]; then
+            echo "::error::No package files found in ./build"
+            exit 1
+          fi
+          echo "Found $COUNT package file(s):"
+          find ./build -name "*.conda" -o -name "*.tar.bz2"
+
+  # ──────────────────────────────────────────────────────────
+  # INT-3: Custom CBC via URL
+  # ──────────────────────────────────────────────────────────
+  test-custom-cbc-url:
+    name: "INT-3: custom CBC URL"
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Build with custom CBC URL
+        uses: ./build-conda
+        with:
+          recipe: build-conda/tests/test-package
+          cbc: https://raw.githubusercontent.com/AnacondaRecipes/aggregate/main/conda_build_config.yaml
+
+      - name: Verify .conda file exists
+        run: |
+          COUNT=$(find ./build -name "*.conda" -o -name "*.tar.bz2" | wc -l)
+          if [ "$COUNT" -eq 0 ]; then
+            echo "::error::No package files found in ./build"
+            exit 1
+          fi
+          echo "Found $COUNT package file(s)"
+
+  # ──────────────────────────────────────────────────────────
+  # INT-4: Local CBC override
+  # ──────────────────────────────────────────────────────────
+  test-custom-cbc-local:
+    name: "INT-4: local CBC override"
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Build with local CBC override
+        uses: ./build-conda
+        with:
+          recipe: build-conda/tests/test-package
+          cbc: build-conda/tests/test-cbc-override/cbc-overrides.yaml
+
+      - name: Verify .conda file exists
+        run: |
+          COUNT=$(find ./build -name "*.conda" -o -name "*.tar.bz2" | wc -l)
+          if [ "$COUNT" -eq 0 ]; then
+            echo "::error::No package files found in ./build"
+            exit 1
+          fi
+          echo "Found $COUNT package file(s)"
+
+  # ──────────────────────────────────────────────────────────
+  # INT-6: Compiled package — anaconda preset, verify CBC pins
+  # ──────────────────────────────────────────────────────────
+  test-compiled-anaconda:
+    name: "INT-6: compiled, anaconda preset"
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Build compiled package (anaconda preset)
+        uses: ./build-conda
+        with:
+          recipe: build-conda/tests/test-compiled
+
+      - name: Verify CBC pins propagated (anaconda preset)
+        env:
+          PIXI_PROJECT_MANIFEST: build-conda/pixi.toml
+        run: |
+          # Assert numpy is present in the embedded CBC and print the full config.
+          # The value should reflect Anaconda's preset pin, not conda-build's default.
+          pixi run python build-conda/tests/check_cbc.py \
+            --package "./build/**/*.conda" \
+            --assert-key numpy \
+            --print
+
+  # ──────────────────────────────────────────────────────────
+  # INT-6b: Compiled package — conda-forge preset
+  # ──────────────────────────────────────────────────────────
+  test-compiled-conda-forge:
+    name: "INT-6b: compiled, conda-forge preset"
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Build compiled package (conda-forge preset)
+        uses: ./build-conda
+        with:
+          recipe: build-conda/tests/test-compiled
+          cbc-preset: conda-forge
+          channels: conda-forge
+
+      - name: Verify CBC pins propagated (conda-forge preset)
+        env:
+          PIXI_PROJECT_MANIFEST: build-conda/pixi.toml
+        run: |
+          # Assert numpy is present in the embedded CBC and print the full config.
+          # The value should reflect conda-forge's preset pin, not conda-build's default.
+          pixi run python build-conda/tests/check_cbc.py \
+            --package "./build/**/*.conda" \
+            --assert-key numpy \
+            --print
+
+  # ──────────────────────────────────────────────────────────
+  # INT-6c: Compiled — anaconda preset + local override
+  # ──────────────────────────────────────────────────────────
+  test-compiled-anaconda-override:
+    name: "INT-6c: compiled, anaconda + local CBC override"
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Build compiled package (anaconda preset + local override)
+        uses: ./build-conda
+        with:
+          recipe: build-conda/tests/test-compiled
+          cbc: build-conda/tests/test-cbc-override/cbc-overrides.yaml
+
+      - name: Verify numpy override propagated (anaconda preset + 1.26.* override)
+        env:
+          PIXI_PROJECT_MANIFEST: build-conda/pixi.toml
+        run: |
+          # cbc-overrides.yaml sets numpy to 1.26.*.  Assert that value made it
+          # into the embedded CBC, proving the custom cbc layered on top of the preset.
+          pixi run python build-conda/tests/check_cbc.py \
+            --package "./build/**/*.conda" \
+            --assert-key numpy \
+            --contains 1.26 \
+            --print
+
+  # ──────────────────────────────────────────────────────────
+  # INT-6d: Compiled — conda-forge preset + local override
+  # ──────────────────────────────────────────────────────────
+  test-compiled-conda-forge-override:
+    name: "INT-6d: compiled, conda-forge + local CBC override"
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Build compiled package (conda-forge preset + local override)
+        uses: ./build-conda
+        with:
+          recipe: build-conda/tests/test-compiled
+          cbc-preset: conda-forge
+          cbc: build-conda/tests/test-cbc-override/cbc-overrides.yaml
+          channels: conda-forge
+
+      - name: Verify numpy override propagated (conda-forge preset + 1.26.* override)
+        env:
+          PIXI_PROJECT_MANIFEST: build-conda/pixi.toml
+        run: |
+          # cbc-overrides.yaml sets numpy to 1.26.*.  Assert that value made it
+          # into the embedded CBC, proving the custom cbc layered on top of conda-forge.
+          pixi run python build-conda/tests/check_cbc.py \
+            --package "./build/**/*.conda" \
+            --assert-key numpy \
+            --contains 1.26 \
+            --print
+
+  # ──────────────────────────────────────────────────────────
+  # INT-6e: Compiled — cbc-preset=none + local CBC only
+  # ──────────────────────────────────────────────────────────
+  test-compiled-none-preset:
+    name: "INT-6e: compiled, cbc-preset=none + local CBC"
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Build compiled package (no preset, local CBC only)
+        uses: ./build-conda
+        with:
+          recipe: build-conda/tests/test-compiled
+          cbc-preset: none
+          cbc: build-conda/tests/test-cbc-override/cbc-overrides.yaml
+          python-version: "3.12"
+
+      - name: Verify numpy from local-only CBC propagated (cbc-preset=none)
+        env:
+          PIXI_PROJECT_MANIFEST: build-conda/pixi.toml
+        run: |
+          # Verify the local CBC override reached the embedded conda_build_config.yaml.
+          # The absence of preset values is guaranteed structurally: resolve_cbc() with
+          # preset=none passes no preset file to --variant-config-files (covered by unit
+          # tests). Here we confirm the override value (1.26.*) is present in the output.
+          pixi run python build-conda/tests/check_cbc.py \
+            --package "./build/**/*.conda" \
+            --assert-key numpy \
+            --contains 1.26 \
+            --print
+
+  # ──────────────────────────────────────────────────────────
+  # INT-7: Multi-python build
+  # ──────────────────────────────────────────────────────────
+  test-multi-python:
+    name: "INT-7: multi-python build"
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Build compiled package for python 3.11 and 3.12
+        uses: ./build-conda
+        with:
+          recipe: build-conda/tests/test-compiled
+          python-version: "3.11,3.12"
+
+      - name: Verify packages exist for both python versions
+        run: |
+          COUNT=$(find ./build -name "*.conda" | wc -l)
+          echo "Found $COUNT package file(s):"
+          find ./build -name "*.conda"
+          if [ "$COUNT" -lt 2 ]; then
+            echo "::error::Expected at least 2 packages (one per python version), found $COUNT"
+            exit 1
+          fi
+
+  # ──────────────────────────────────────────────────────────
+  # INT-8: Custom conda-build version
+  # ──────────────────────────────────────────────────────────
+  test-custom-conda-build-version:
+    name: "INT-8: custom conda-build version"
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Build with specific conda-build version
+        uses: ./build-conda
+        with:
+          recipe: build-conda/tests/test-package
+          conda-build-version: "24.9.0"
+
+      - name: Verify conda-build version used
+        env:
+          PIXI_PROJECT_MANIFEST: build-conda/pixi.toml
+        run: |
+          VERSION=$(pixi run conda-build --version)
+          echo "conda-build version: $VERSION"
+          if [[ "$VERSION" != *"24.9.0"* ]]; then
+            echo "::error::Expected conda-build 24.9.0, got: $VERSION"
+            exit 1
+          fi
+
+      - name: Verify .conda file exists
+        run: |
+          COUNT=$(find ./build -name "*.conda" -o -name "*.tar.bz2" | wc -l)
+          if [ "$COUNT" -eq 0 ]; then
+            echo "::error::No package files found in ./build"
+            exit 1
+          fi
+
+  # ──────────────────────────────────────────────────────────
+  # INT-10: Recipe auto-discovery failure
+  # ──────────────────────────────────────────────────────────
+  test-discovery-failure:
+    name: "INT-10: auto-discovery failure"
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Build (no recipe anywhere — should fail)
+        id: build
+        uses: ./build-conda
+        continue-on-error: true
+
+      - name: Verify action failed with the right error
+        run: |
+          if [ "${{ steps.build.outcome }}" != "failure" ]; then
+            echo "::error::Expected action to fail (no recipe found) but it succeeded"
+            exit 1
+          fi
+          echo "Correctly failed when no recipe was found"
+
+  # ──────────────────────────────────────────────────────────
+  # INT-11: Recipe auto-discovery ambiguity
+  # ──────────────────────────────────────────────────────────
+  test-discovery-ambiguity:
+    name: "INT-11: auto-discovery ambiguity"
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up multiple recipe directories
+        run: |
+          cp -r build-conda/tests/test-package conda.recipe
+          cp -r build-conda/tests/test-package recipe
+
+      - name: Build (ambiguous recipe — should fail)
+        id: build
+        uses: ./build-conda
+        continue-on-error: true
+
+      - name: Verify action failed with the right error
+        run: |
+          if [ "${{ steps.build.outcome }}" != "failure" ]; then
+            echo "::error::Expected action to fail (multiple recipes found) but it succeeded"
+            exit 1
+          fi
+          echo "Correctly failed when multiple recipes were found"
+
+  # ──────────────────────────────────────────────────────────
+  # INT-5: Build + upload end-to-end
+  # ──────────────────────────────────────────────────────────
+  test-build-and-upload:
+    name: "INT-5: build + upload (anaconda.org)"
+    runs-on: self-hosted-amd64-medium-privileged-on-demand
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Build test package
+        uses: ./build-conda
+        with:
+          recipe: build-conda/tests/test-package
+
+      - name: Upload to anaconda.org
+        uses: ./upload-package
+        with:
+          token: ${{ secrets.ANACONDA_ORG_TEST_TOKEN }}
+          owner: anaconda-cloud
+          packages: ./build/**/*.conda
+          private: true
+          labels: "main,dev"
+
+  # ──────────────────────────────────────────────────────────
+  # Aggregate check
+  # ──────────────────────────────────────────────────────────
+  check:
+    name: Check
+    if: always()
+    needs:
+      - test-zero-config
+      - test-conda-forge-preset
+      - test-custom-cbc-url
+      - test-custom-cbc-local
+      - test-compiled-anaconda
+      - test-compiled-conda-forge
+      - test-compiled-anaconda-override
+      - test-compiled-conda-forge-override
+      - test-compiled-none-preset
+      - test-multi-python
+      - test-custom-conda-build-version
+      - test-discovery-failure
+      - test-discovery-ambiguity
+      - test-build-and-upload
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide whether all jobs succeeded
+        uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe # v1.2.2
+        with:
+          jobs: ${{ toJSON(needs) }}

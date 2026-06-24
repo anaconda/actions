@@ -1,0 +1,5 @@
+# CBC override for testing.
+# Overrides the numpy pin so INT-4 / INT-6c / INT-6d can verify that
+# the custom CBC is layered on top of the preset rather than replaced.
+numpy:
+  - 1.26.*
