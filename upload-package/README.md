@@ -10,8 +10,6 @@ Upload conda or Python packages to Anaconda.org or Package Security Manager (PSM
 | `packages` | Path or glob pattern to package files | Yes | - |
 | `channel` | Channel to upload to (org name or channel) | Yes* | - |
 | `owner` | **Deprecated**: Use `channel` instead | Yes* | - |
-
-\* Either `channel` or `owner` must be provided. If both are provided, `channel` takes precedence.
 | `target-type` | `anaconda.org` or `psm` | No | `anaconda.org` |
 | `repository-url` | Repository API URL (required when target-type is `psm`) | No | - |
 | `package-type` | `conda` or `pypi` (auto-detected if not specified) | No | - |
@@ -21,6 +19,9 @@ Upload conda or Python packages to Anaconda.org or Package Security Manager (PSM
 | `force` | Overwrite existing packages | No | `false` |
 | `verbose` | Enable verbose output | No | `false` |
 | `disable-new-cli` | Disable new anaconda-client CLI parser (anaconda.org only) | No | `false` |
+
+(*) Either `channel` or `owner` must be provided. If both are provided, `channel` takes precedence.
+
 
 ## Usage
 
